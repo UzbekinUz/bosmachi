@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme {
+  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --color-ink-950: #060b1c;
+  --color-ink-900: #0a1230;
+  --color-ink-800: #101b43;
+  --color-ink-700: #1a2a5e;
+  --color-ink-600: #27407f;
+  --color-brand-400: #5b9bff;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+}
+
+:root { color-scheme: dark; }
+html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0;
+  color: #dbe6ff;
+  background:
+    radial-gradient(900px 500px at 85% -10%, rgba(59,130,246,.14), transparent 60%),
+    radial-gradient(700px 400px at -10% 110%, rgba(37,99,235,.10), transparent 60%),
+    #060b1c;
+  background-attachment: fixed;
+}
+button, a { touch-action: manipulation; }
+select option { background: #0a1230; color: #dbe6ff; }
+.leaflet-container { background: #0a1230; isolation: isolate; }
