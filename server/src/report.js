@@ -253,7 +253,7 @@ export async function buildReportDoc({ groupIds, missing = 'placeholder' }) {
   sections.push(summarySection(subs, people));
 
   const doc = new Document({
-    creator: 'Bosmachi',
+    creator: 'Hygge',
     title: 'Ijara xonadonlari hisoboti',
     styles: { default: { document: { run: { font: FONT, size: 28 } } } },
     sections,

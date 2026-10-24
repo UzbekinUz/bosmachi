@@ -56,7 +56,7 @@ export default function AdminLayout() {
     <div className="min-h-screen">
       <header className="sticky top-0 z-30 border-b border-[var(--rule)] bg-ink-950">
         <div className="mx-auto flex h-12 max-w-[1208px] items-center gap-8 px-4 sm:px-6 lg:px-10">
-          <Link to="/admin" aria-label="Bosmachi"><Logo /></Link>
+          <Link to="/admin" aria-label="Hygge"><Logo /></Link>
 
           <nav className="hidden items-center gap-6 lg:flex" aria-label="Asosiy">
             {visible.map((l) => (

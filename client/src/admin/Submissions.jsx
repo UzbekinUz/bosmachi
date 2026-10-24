@@ -66,7 +66,7 @@ export default function Submissions() {
   };
   const download = async () => {
     const blob = await api('/admin/export', { raw: true });
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'bosmachi.xlsx' });
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'hygge.xlsx' });
     a.click();
     URL.revokeObjectURL(a.href);
   };

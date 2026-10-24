@@ -75,21 +75,22 @@ export function Alert({ type = 'error', children }) {
 // Holat: bitta tus (to'q fonda o'z rangining tusi)
 export const Pill = ({ tone = 'neutral', className = '', children }) => <span className={`pill pill-${tone} ${className}`}>{children}</span>;
 
-/* ---------- Mahsulot belgisi: tom ostida to'rtta rasm joyi ---------- */
-export function Mark({ size = 26 }) {
+/* ---------- Mahsulot belgisi (A variant): qalqon, ichida tom va H harfi ---------- */
+export function Mark({ size = 30 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M2.8 10.4 12 2.8l9.2 7.6" fill="none" stroke="#4cb3f0" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      {[[5.5, 12.2], [13.5, 12.2], [5.5, 17.6], [13.5, 17.6]].map(([x, y]) => <rect key={`${x}${y}`} x={x} y={y} width="5" height="3.8" rx="1" fill="#4cb3f0" />)}
+    <svg width={size * 0.86} height={size} viewBox="0 0 48 56" aria-hidden="true">
+      <path d="M24 2.5 44.5 9.5v18.2c0 12.4-8.4 21.5-20.5 26.3C11.9 49.200 3.500 40.100 3.500 27.700V9.500z" fill="#2563eb" />
+      <path d="M12.500 26 24 15.500 35.500 26" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17.500 26.500v14M30.500 26.500v14M17.500 33.500h13" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" />
     </svg>
   );
 }
 
-export function Logo({ size = 'text-lg' }) {
+export function Logo({ size = 'text-xl' }) {
   return (
-    <div className={`flex items-center gap-2.5 font-semibold tracking-tight text-white ${size}`}>
+    <div className={`flex items-center gap-2.5 font-bold tracking-tight text-white ${size}`}>
       <Mark />
-      Bosmachi
+      Hygge
     </div>
   );
 }

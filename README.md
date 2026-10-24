@@ -1,4 +1,4 @@
-# Bosmachi
+# Hygge
 
 Talabalar ijara/yashash ma'lumotlarini yig'ish tizimi (React + Tailwind + Express + MongoDB).
 

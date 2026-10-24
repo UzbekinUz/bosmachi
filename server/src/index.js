@@ -320,7 +320,7 @@ admin.get('/export', wrap(async (req, res) => {
   const wb = await buildWorkbook(scopeIds(req));
   audit(req, 'export.excel', 'Excel yuklab oldi');
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition', 'attachment; filename="bosmachi.xlsx"');
+  res.setHeader('Content-Disposition', 'attachment; filename="hygge.xlsx"');
   await wb.xlsx.write(res);
   res.end();
 }));
@@ -352,4 +352,4 @@ await mongoose.connect(process.env.MONGO_URI);
 await seed();
 await ensureOwner();
 await syncExcel();
-app.listen(process.env.PORT || 5000, () => console.log(`Bosmachi server: http://localhost:${process.env.PORT || 5000}`));
+app.listen(process.env.PORT || 5000, () => console.log(`Hygge server: http://localhost:${process.env.PORT || 5000}`));
