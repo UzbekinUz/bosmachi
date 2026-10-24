@@ -4,11 +4,12 @@
 /* Bosmachi: qora-ko'k, tekis ranglar. Gradient, yaltiroq soya va shishasimon fon ishlatilmaydi. */
 @theme {
   --font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-  --color-ink-950: #070c1d;
-  --color-ink-900: #0b1330;
-  --color-ink-800: #0f1a3d;
-  --color-ink-700: #1a2755;
-  --color-ink-600: #2a3f7d;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --color-ink-950: #080e22;
+  --color-ink-900: #0c1530;
+  --color-ink-800: #111c3d;
+  --color-ink-700: #1a284f;
+  --color-ink-600: #2b3d73;
   --color-brand-400: #6ba5ff;
   --color-brand-500: #3b82f6;
   --color-brand-600: #2563eb;
@@ -20,10 +21,11 @@ html, body, #root { min-height: 100%; }
 body {
   margin: 0;
   color: #e3ebff;
-  background: #070c1d;
+  background: #080e22;
   font-feature-settings: "tnum" 1;
 }
 h1, h2, h3 { letter-spacing: -0.015em; }
+h1, h2 { text-wrap: balance; }
 button, a { touch-action: manipulation; }
 select option { background: #0b1330; color: #e3ebff; }
 .leaflet-container { background: #0b1330; isolation: isolate; }

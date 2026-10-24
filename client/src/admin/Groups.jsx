@@ -45,7 +45,7 @@ export default function Groups() {
       <Alert>{error}</Alert>
       <Card className="overflow-x-auto !p-0">
         <table className="w-full min-w-[760px] text-left text-sm">
-          <thead className="border-b border-ink-700 text-xs uppercase tracking-wide text-slate-400">
+          <thead className="bg-ink-700 text-sm font-semibold text-slate-100">
             <tr>{['Guruh', 'Fakultet', 'Yo‘nalish', 'Kurs', 'Tyutor', 'Talabalar', 'To‘ldirgan', ''].map((h) => <th key={h} className="px-4 py-3 font-medium">{h}</th>)}</tr>
           </thead>
           <tbody>

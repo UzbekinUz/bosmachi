@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Field, Input, Modal, PageHead, Select } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Modal, PageHead, Select, StatusDot } from '../components/ui.jsx';
 
 const editable = [
   ['phone', 'Telefon'], ['landlordName', 'Uy egasi'], ['landlordPhone', 'Uy egasi telefoni'],
@@ -78,10 +78,10 @@ export default function Submissions() {
               <a href={`tel:${r.phone}`} className="text-sm text-brand-400">{r.phone}</a>
             </div>
             <div className="text-sm text-slate-300">{[r.district, r.mahalla, r.street].filter(Boolean).join(', ') || '—'}</div>
-            <Select value={r.rentStatus || ''} onChange={(e) => patch(r._id, { rentStatus: e.target.value })}>
+            <div className="flex items-center gap-2"><StatusDot value={r.rentStatus} /><Select value={r.rentStatus || ''} onChange={(e) => patch(r._id, { rentStatus: e.target.value })}>
               <option value="">Ijara holati: belgilanmagan</option>
               {statuses.map((s) => <option key={s._id}>{s.value}</option>)}
-            </Select>
+            </Select></div>
             <div className="flex gap-2">
               <Button variant="ghost" className="flex-1" onClick={() => setEdit(r)}>Ko‘rish</Button>
               <Button variant="danger" className="flex-1" onClick={() => remove(r._id)}>O‘chirish</Button>
@@ -94,7 +94,7 @@ export default function Submissions() {
       {/* Kompyuter: jadval */}
       <Card className="hidden overflow-x-auto !p-0 md:block">
         <table className="w-full min-w-[820px] text-left text-sm">
-          <thead className="border-b border-ink-700 text-xs uppercase tracking-wide text-slate-400">
+          <thead className="bg-ink-700 text-sm font-semibold text-slate-100">
             <tr>{['Guruh', 'To‘liq ismi', 'Telefon', 'Tuman / Mahalla', 'Ijara holati', ''].map((h) => <th key={h} className="px-4 py-3 font-medium">{h}</th>)}</tr>
           </thead>
           <tbody>
@@ -102,13 +102,13 @@ export default function Submissions() {
               <tr key={r._id} className="border-b border-ink-700/60 last:border-0 hover:bg-ink-700/20">
                 <td className="px-4 py-3 text-blue-200">{r.groupIndex}</td>
                 <td className="px-4 py-3 font-medium text-white">{r.fullName}</td>
-                <td className="px-4 py-3">{r.phone}</td>
+                <td className="whitespace-nowrap px-4 py-3">{r.phone}</td>
                 <td className="px-4 py-3 text-slate-300">{[r.district, r.mahalla].filter(Boolean).join(' / ') || '—'}</td>
                 <td className="px-4 py-3">
-                  <Select value={r.rentStatus || ''} onChange={(e) => patch(r._id, { rentStatus: e.target.value })} className="!py-1.5">
+                  <div className="flex items-center gap-2"><StatusDot value={r.rentStatus} /><Select value={r.rentStatus || ''} onChange={(e) => patch(r._id, { rentStatus: e.target.value })} className="!py-1.5">
                     <option value="">Belgilanmagan</option>
                     {statuses.map((s) => <option key={s._id}>{s.value}</option>)}
-                  </Select>
+                  </Select></div>
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 text-right">
                   <button onClick={() => setEdit(r)} className="mr-3 text-brand-400 hover:underline">Ko‘rish</button>

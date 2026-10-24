@@ -294,9 +294,9 @@ export default function Photos() {
           const st = statusOf(r.count);
           return (
             <button key={r._id} type="button" onClick={() => setOpenId(r._id)} className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3.5 text-left transition hover:bg-ink-700/60">
-              <span className="min-w-0 flex-1">
-                <span className="block truncate font-medium text-white">{r.fullName}</span>
-                <span className="block truncate text-sm text-slate-300"><span className="text-blue-300">{r.groupIndex}</span>{r.address ? ` · ${r.address}` : ''}</span>
+              <span className="min-w-0 basis-full sm:basis-0 sm:flex-1">
+                <span className="block font-medium text-white sm:truncate">{r.fullName}</span>
+                <span className="block text-sm text-slate-300 sm:truncate"><span className="text-blue-300">{r.groupIndex}</span>{r.address ? ` · ${r.address}` : ''}</span>
               </span>
               <span className="flex items-center gap-1" aria-hidden>
                 {[1, 2, 3, 4].map((n) => <span key={n} className={`h-2 w-5 rounded-full ${r.photos.some((p) => p.slot === n) ? 'bg-brand-500' : 'bg-ink-700'}`} />)}

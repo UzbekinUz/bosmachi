@@ -54,7 +54,7 @@ export function Button({ variant = 'primary', className = '', disabled, ...props
 }
 
 export const Card = ({ className = '', ...props }) => (
-  <div {...props} className={`rounded-xl border border-ink-700 bg-ink-800 p-4 sm:p-5 ${className}`} />
+  <div {...props} className={`rounded-lg bg-ink-800 p-4 sm:p-6 ${className}`} />
 );
 
 export function Alert({ type = 'error', children }) {
@@ -74,13 +74,19 @@ export function Alert({ type = 'error', children }) {
   );
 }
 
-export function Logo({ size = 'text-xl' }) {
+export function Logo({ size = 'text-2xl', inverse = false }) {
   return (
-    <div className={`flex items-center gap-2.5 font-bold tracking-tight text-white ${size}`}>
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-base text-white">B</span>
+    <div className={`flex items-center gap-2.5 font-serif font-semibold tracking-tight text-white ${size}`}>
+      <span className={`grid h-9 w-9 place-items-center rounded-lg font-sans text-base font-bold ${inverse ? 'bg-white text-brand-600' : 'bg-brand-600 text-white'}`}>B</span>
       Bosmachi
     </div>
   );
+}
+
+/* Ijara holati: Yashil / Sariq / Qizil rangli nuqta */
+export function StatusDot({ value }) {
+  const color = { yashil: 'bg-emerald-400', sariq: 'bg-amber-400', qizil: 'bg-red-400' }[String(value || '').toLowerCase()] || 'bg-slate-600';
+  return <span title={value || 'Belgilanmagan'} className={`h-3 w-3 shrink-0 rounded-full ${color}`} />;
 }
 
 /* ---------- Modal / pastdan chiqadigan panel (telefonda bottom sheet) ---------- */
@@ -189,16 +195,16 @@ export function Picker({ value, onChange, options, placeholder = 'Tanlang…', t
 export function PageHead({ title, children, steps = [] }) {
   return (
     <header className="mb-6 max-w-3xl">
-      <h1 className="text-2xl font-semibold text-white sm:text-[1.75rem]">{title}</h1>
+      <h1 className="font-serif text-3xl font-semibold text-white sm:text-4xl">{title}</h1>
       {children && <p className="mt-1.5 text-[15px] leading-relaxed text-slate-300">{children}</p>}
       {steps.length > 0 && (
         <details className="group mt-3">
-          <summary className="inline-flex min-h-9 cursor-pointer select-none items-center gap-2 rounded-lg border border-ink-600 px-3 text-sm text-slate-200 transition hover:bg-ink-700">
-            <span className="grid h-5 w-5 place-items-center rounded-full border border-slate-400 text-xs leading-none">i</span>
+          <summary className="inline-flex min-h-9 cursor-pointer select-none items-center gap-2 rounded-lg bg-ink-800 px-3 text-sm text-slate-100 transition hover:bg-ink-700">
+            <span className="grid h-5 w-5 place-items-center rounded-full bg-ink-600 text-xs leading-none text-white">i</span>
             Qanday ishlaydi?
             <svg className="h-3.5 w-3.5 transition group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 8 5 5 5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </summary>
-          <ul className="mt-3 space-y-2 rounded-lg bg-ink-800 p-4 text-[15px] leading-relaxed text-slate-200">
+          <ul className="mt-3 space-y-2.5 rounded-lg bg-ink-800 p-4 text-[15px] leading-relaxed text-slate-100 sm:p-5">
             {steps.map((t, i) => (
               <li key={i} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" /><span>{t}</span></li>
             ))}

@@ -3,7 +3,7 @@ import { api } from '../api.js';
 import { Alert, Button, Card, PageHead } from '../components/ui.jsx';
 
 const Stat = ({ label, value, tone = 'text-white' }) => (
-  <Card className="!p-4"><div className="text-xs uppercase tracking-wide text-slate-400">{label}</div><div className={`mt-1 text-2xl font-bold ${tone}`}>{value}</div></Card>
+  <Card className="!p-4"><div className="text-sm text-slate-300">{label}</div><div className={`mt-1 font-serif text-4xl font-semibold ${tone}`}>{value}</div></Card>
 );
 
 export default function Monitor() {

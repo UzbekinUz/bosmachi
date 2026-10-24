@@ -13,7 +13,7 @@ const Section = ({ title, hint, children }) => (
   <Item as="section">
     <Card className="space-y-4">
       <div>
-        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        <h2 className="font-serif text-xl font-semibold text-white">{title}</h2>
         {hint && <p className="mt-1 text-[14px] leading-snug text-slate-300">{hint}</p>}
       </div>
       {children}
@@ -91,19 +91,21 @@ export default function FormPage() {
   const hasAddress = ['region', 'district', 'mahalla', 'street', 'house', 'apartment', 'location'].some((k) => fieldMap[k]);
 
   return (
-    <div className="mx-auto max-w-xl px-4 pb-32 pt-5 sm:pt-10">
-      <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-5 flex items-center justify-between">
-        <Logo />
-        <Link to="/admin" className="rounded-lg px-2 py-1.5 text-sm text-slate-500 transition hover:text-brand-400">Admin</Link>
-      </motion.header>
+    <div>
+      <div className="bg-brand-600">
+        <div className="mx-auto max-w-xl px-4 pb-9 pt-5 sm:pt-8">
+          <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-9 flex items-center justify-between">
+            <Logo inverse />
+            <Link to="/admin" className="rounded-lg px-2 py-1.5 text-sm text-blue-100 transition hover:text-white">Admin</Link>
+          </motion.header>
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <h1 className="font-serif text-4xl font-semibold leading-[1.05] text-white sm:text-5xl">Ijara ma’lumotlari</h1>
+            {!done && <p className="mt-3 max-w-md text-[16px] leading-relaxed text-blue-50">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>}
+          </motion.div>
+        </div>
+      </div>
 
-      {!done && (
-        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
-          <h1 className="text-2xl font-semibold text-white">Ijara ma’lumotlari</h1>
-          <p className="mt-1.5 text-[15px] leading-relaxed text-slate-300">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>
-        </motion.div>
-      )}
-
+      <div className="mx-auto max-w-xl px-4 pb-32 pt-6">
       {!cfg && !error && <p className="py-10 text-center text-slate-400">Yuklanmoqda…</p>}
 
       <AnimatePresence mode="wait">
@@ -188,7 +190,7 @@ export default function FormPage() {
                     >
                       <div className="space-y-3 rounded-lg border border-ink-600/60 bg-ink-900/50 p-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-xs font-medium uppercase tracking-wide text-slate-400">{i + 1}-shaxs</span>
+                          <span className="text-sm font-medium text-slate-300">{i + 1}-shaxs</span>
                           <button type="button" onClick={() => setPeople(people.filter((x) => x.id !== p.id))} className="rounded-md px-2 py-1 text-sm text-red-300 transition hover:bg-red-500/10">O‘chirish</button>
                         </div>
                         <Input placeholder="Kim ekanligi (masalan: TDPI talabasi)" value={p.info} onChange={(e) => setPerson(i, { info: e.target.value })} />
@@ -258,6 +260,7 @@ export default function FormPage() {
       <AnimatePresence>
         {mapOpen && <MapPicker value={form.location} onClose={() => setMapOpen(false)} onSelect={(link) => setForm((f) => ({ ...f, location: link }))} />}
       </AnimatePresence>
+      </div>
     </div>
   );
 }
