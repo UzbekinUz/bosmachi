@@ -2,9 +2,10 @@ import express from 'express';
 import multer from 'multer';
 import mongoose from 'mongoose';
 import fs from 'node:fs';
-import { Student, Photo } from './models.js';
+import { Student, Photo, Submission } from './models.js';
 import { saveVariants, removeFiles, photoPath } from './storage.js';
 import { buildReportDoc, reportPreview } from './report.js';
+import { assertGroup, resolveScope, inScope } from './users.js';
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
 const SLOTS = [1, 2, 3, 4];
@@ -31,11 +32,11 @@ const checkSlot = (v) => {
 // Admin router'ga ulanadi (JWT index.js dagi admin.use(auth) orqali allaqachon tekshiriladi)
 export const photosRouter = express.Router();
 
-// Talabalar ro'yxati va ularning rasmlari (guruh bo'yicha)
+// Faqat formani to'ldirgan talabalar va ularning rasmlari (guruh bo'yicha)
 photosRouter.get('/photos/summary', wrap(async (req, res) => {
-  if (req.query.group) checkId(req.query.group);
-  const q = req.query.group ? { group: req.query.group } : {};
-  const students = await Student.find(q).populate('group', 'index').sort({ fullName: 1 }).lean();
+  const q = inScope(resolveScope(req, req.query.group));
+  const done = await Submission.find(q).distinct('student');
+  const students = await Student.find({ ...q, _id: { $in: done } }).populate('group', 'index').sort({ fullName: 1 }).lean();
   const photos = await Photo.find({ student: { $in: students.map((s) => s._id) } }).lean();
   const byStudent = {};
   for (const p of photos) (byStudent[p.student] ||= []).push({ id: p._id, slot: p.slot, updatedAt: p.updatedAt });
@@ -52,6 +53,8 @@ photosRouter.put('/students/:id/photos/:slot', upload.single('photo'), wrap(asyn
   if (!req.file) throw badRequest('Rasm tanlanmagan');
   const student = await Student.findById(req.params.id);
   if (!student) throw badRequest('Talaba topilmadi');
+  assertGroup(req, student.group);
+  if (!(await Submission.exists({ student: student._id }))) throw badRequest('Rasm faqat formani to‘ldirgan talaba uchun yuklanadi');
 
   const file = `${student._id}/${slot}`;
   let size;
@@ -72,6 +75,8 @@ photosRouter.put('/students/:id/photos/:slot', upload.single('photo'), wrap(asyn
 photosRouter.delete('/students/:id/photos/:slot', wrap(async (req, res) => {
   checkId(req.params.id);
   const slot = checkSlot(req.params.slot);
+  const owner = await Student.findById(req.params.id).select('group').lean();
+  if (owner) assertGroup(req, owner.group);
   const photo = await Photo.findOneAndDelete({ student: req.params.id, slot });
   if (photo) await removeFiles(photo.file);
   res.json({ ok: true });
@@ -82,6 +87,7 @@ photosRouter.get('/photos/:id/file', wrap(async (req, res) => {
   checkId(req.params.id);
   const photo = await Photo.findById(req.params.id).lean();
   if (!photo) return res.status(404).json({ message: 'Rasm topilmadi' });
+  assertGroup(req, photo.group);
   const file = photoPath(photo.file, req.query.v === 'thumb' ? 'thumb' : 'full');
   if (!fs.existsSync(file)) return res.status(404).json({ message: 'Rasm fayli topilmadi' });
   res.setHeader('Content-Type', 'image/jpeg');
@@ -91,13 +97,11 @@ photosRouter.get('/photos/:id/file', wrap(async (req, res) => {
 
 // Hisobotdan oldin tekshiruv
 photosRouter.get('/report/preview', wrap(async (req, res) => {
-  if (req.query.group) checkId(req.query.group);
-  res.json(await reportPreview(req.query.group));
+  res.json(await reportPreview(resolveScope(req, req.query.group)));
 }));
 
 photosRouter.get('/report', wrap(async (req, res) => {
-  if (req.query.group) checkId(req.query.group);
-  const { buffer, name } = await buildReportDoc({ groupId: req.query.group, missing: req.query.missing === 'skip' ? 'skip' : 'placeholder' });
+  const { buffer, name } = await buildReportDoc({ groupIds: resolveScope(req, req.query.group), missing: req.query.missing === 'skip' ? 'skip' : 'placeholder' });
   res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
   res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
   res.send(buffer);

@@ -12,11 +12,11 @@ function coords(link) {
 // Yandex havolasida tartib lng,lat bo'lishi mumkin — ikkala tartibni tekshiramiz
 const inTashkent = ([a, b]) => [[a, b], [b, a]].some(([lat, lng]) => lat > 41.0 && lat < 41.6 && lng > 68.9 && lng < 69.7);
 
-export async function buildReport() {
+export async function buildReport(ids = null) {
   const [groups, students, subs] = await Promise.all([
-    Group.find().sort({ index: 1 }).lean(),
-    Student.find().sort({ fullName: 1 }).lean(),
-    Submission.find().lean(),
+    Group.find(ids ? { _id: { $in: ids } } : {}).sort({ index: 1 }).lean(),
+    Student.find(ids ? { group: { $in: ids } } : {}).sort({ fullName: 1 }).lean(),
+    Submission.find(ids ? { group: { $in: ids } } : {}).lean(),
   ]);
   const done = new Set(subs.map((s) => String(s.student)));
 

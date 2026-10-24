@@ -97,10 +97,10 @@ function fillSheet(ws, subs) {
 }
 
 // Har bir guruh uchun alohida list (guruh nomi bilan)
-export async function buildWorkbook() {
+export async function buildWorkbook(ids = null) {
   const [groups, subs] = await Promise.all([
-    Group.find().sort({ index: 1 }).lean(),
-    Submission.find().sort({ fullName: 1 }).lean(),
+    Group.find(ids ? { _id: { $in: ids } } : {}).sort({ index: 1 }).lean(),
+    Submission.find(ids ? { group: { $in: ids } } : {}).sort({ fullName: 1 }).lean(),
   ]);
   const wb = new ExcelJS.Workbook();
   const used = new Set();

@@ -54,10 +54,10 @@ const addressKey = (s) => ['region', 'district', 'mahalla', 'street', 'house', '
 const joinNames = (list) => (list.length < 2 ? list[0] || '' : `${list.slice(0, -1).join(', ')} va ${list[list.length - 1]}`);
 
 // Talabalarni yig'ib, sahifalarga ajratadi (bitta xonadondagi talabalar — bitta sahifa)
-async function collect(groupId) {
-  const q = groupId ? { group: groupId } : {};
+async function collect(groupIds) {
+  const q = groupIds ? { group: { $in: groupIds } } : {};
   const [groups, students, subs, photos] = await Promise.all([
-    Group.find(groupId ? { _id: groupId } : {}).sort({ index: 1 }).lean(),
+    Group.find(groupIds ? { _id: { $in: groupIds } } : {}).sort({ index: 1 }).lean(),
     Student.find(q).sort({ fullName: 1 }).lean(),
     Submission.find(q).lean(),
     Photo.find(q).sort({ slot: 1 }).lean(),
@@ -67,9 +67,9 @@ async function collect(groupId) {
   const photosBy = {};
   for (const p of photos) (photosBy[String(p.student)] ||= []).push(p);
 
-  // Ijarada turadigan (forma to'ldirgan) yoki rasmi bor talabalar
+  // Faqat formani to'ldirgan (ijarada turadigan) talabalar
   const entries = students
-    .filter((s) => subBy[String(s._id)] || photosBy[String(s._id)]?.length)
+    .filter((s) => subBy[String(s._id)])
     .map((s) => ({
       student: s,
       group: groupBy[String(s.group)],
@@ -97,8 +97,8 @@ async function collect(groupId) {
   return { groups, entries, pages, subs };
 }
 
-export async function reportPreview(groupId) {
-  const { entries, pages } = await collect(groupId);
+export async function reportPreview(groupIds) {
+  const { entries, pages } = await collect(groupIds);
   return {
     students: entries.length,
     pages: pages.length,
@@ -235,8 +235,8 @@ function summarySection(subs, tutors) {
   };
 }
 
-export async function buildReportDoc({ groupId, missing = 'placeholder' }) {
-  const { groups, pages, subs } = await collect(groupId);
+export async function buildReportDoc({ groupIds, missing = 'placeholder' }) {
+  const { groups, pages, subs } = await collect(groupIds);
   const tutors = [...new Set(groups.map((g) => formatName(g.tutor)).filter(Boolean))];
   const use = missing === 'skip' ? pages.filter((p) => p.source.photos.length === 4) : pages;
 
@@ -250,6 +250,6 @@ export async function buildReportDoc({ groupId, missing = 'placeholder' }) {
     styles: { default: { document: { run: { font: FONT, size: 28 } } } },
     sections,
   });
-  const label = groupId ? (groups[0]?.index || 'guruh') : 'hammasi';
+  const label = groups.length === 1 ? groups[0].index : 'hammasi';
   return { buffer: await Packer.toBuffer(doc), name: `hisobot-${label.replace(/[^\w-]+/g, '-')}.docx` };
 }

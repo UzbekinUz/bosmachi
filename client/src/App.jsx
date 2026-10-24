@@ -5,6 +5,7 @@ import AdminLayout from './admin/AdminLayout.jsx';
 import Submissions from './admin/Submissions.jsx';
 import Groups from './admin/Groups.jsx';
 import Fields from './admin/Fields.jsx';
+import Users from './admin/Users.jsx';
 import Photos from './admin/Photos.jsx';
 import Monitor from './admin/Monitor.jsx';
 import Options from './admin/Options.jsx';
@@ -18,6 +19,7 @@ export default function App() {
         <Route index element={<Submissions />} />
         <Route path="monitor" element={<Monitor />} />
         <Route path="photos" element={<Photos />} />
+        <Route path="users" element={<Users />} />
         <Route path="groups" element={<Groups />} />
         <Route path="fields" element={<Fields />} />
         <Route path="options" element={<Options />} />

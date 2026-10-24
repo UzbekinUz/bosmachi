@@ -199,7 +199,7 @@ export default function Photos() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-400">Tyutor talaba xonadonida olgan 4 ta rasmni yuklang. Rasmlar <code className="text-brand-400">server/data/photos</code> papkasida, Excel fayli yonida saqlanadi.</p>
+      <p className="text-sm text-slate-400">Faqat formani to‘ldirgan talabalar ko‘rinadi. Tyutor talaba xonadonida olgan 4 ta rasmni yuklang. Rasmlar <code className="text-brand-400">server/data/photos</code> papkasida, Excel fayli yonida saqlanadi.</p>
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-44"><Field label="Guruh"><Select value={group} onChange={(e) => setGroup(e.target.value)}><option value="">Barchasi</option>{groups.map((g) => <option key={g._id} value={g._id}>{g.index}</option>)}</Select></Field></div>
         <div className="min-w-48 flex-1"><Field label="Talaba qidirish"><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ism bo‘yicha…" /></Field></div>
@@ -225,7 +225,7 @@ export default function Photos() {
             </button>
           );
         })}
-        {!shown.length && <p className="px-4 py-10 text-center text-slate-500">Talaba topilmadi</p>}
+        {!shown.length && <p className="px-4 py-10 text-center text-slate-500">Formani to‘ldirgan talaba topilmadi</p>}
       </Card>
 
       {opened && <StudentModal student={opened} onClose={() => setOpenId(null)} onChanged={load} />}

@@ -67,4 +67,15 @@ const Photo = model('Photo', new Schema({
 }, { timestamps: true }));
 Photo.schema.index({ student: 1, slot: 1 }, { unique: true });
 
-export { Group, Student, Option, FieldConfig, Submission, Photo };
+// Platforma foydalanuvchilari: egasi (owner) va kuratorlar (curator). Kurator faqat o'ziga biriktirilgan guruhlarni ko'radi.
+const User = model('User', new Schema({
+  username: { type: String, required: true, unique: true, lowercase: true, trim: true },
+  fullName: { type: String, default: '', trim: true },
+  passwordHash: { type: String, required: true },
+  role: { type: String, enum: ['owner', 'curator'], default: 'curator' },
+  groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
+  active: { type: Boolean, default: true },
+  mustChangePassword: { type: Boolean, default: false },
+}, { timestamps: true }));
+
+export { Group, Student, Option, FieldConfig, Submission, Photo, User };
