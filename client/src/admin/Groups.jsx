@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { api } from '../api.js';
 import { Alert, Button, Card, Field, Input, Modal, PageHead } from '../components/ui.jsx';
 
 const blank = { index: '', faculty: '', direction: '', course: '', tutor: '', tutorPhone: '' };
 
 export default function Groups() {
+  const { me } = useOutletContext();
+  const curator = me.role === 'curator';
   const [groups, setGroups] = useState([]);
   const [form, setForm] = useState(null); // {_id?, ...}
   const [studentsOf, setStudentsOf] = useState(null);
@@ -22,8 +25,7 @@ export default function Groups() {
   };
   const remove = async (g) => {
     if (!confirm(`${g.index} guruhi, uning talabalari va yuborilgan ma’lumotlari o‘chiriladi. Davom etasizmi?`)) return;
-    await api(`/admin/groups/${g._id}`, { method: 'DELETE' });
-    load();
+    try { await api(`/admin/groups/${g._id}`, { method: 'DELETE' }); setError(''); load(); } catch (err) { setError(err.message); }
   };
 
   return (
@@ -37,10 +39,10 @@ export default function Groups() {
           'Guruhni o‘chirsangiz, uning talabalari, yozuvlari va rasmlari ham o‘chadi.',
         ]}
       >
-        Talabalar guruhlari, ularning tyutorlari va talabalar ro‘yxati.
+        {curator ? 'O‘zingiz yaratgan guruhlar va ularning talabalar ro‘yxati. Yangi guruh avtomatik sizga biriktiriladi.' : 'Talabalar guruhlari, ularning tyutorlari va talabalar ro‘yxati.'}
       </PageHead>
       <div className="flex justify-end">
-        <Button onClick={() => setForm({ ...blank })}>+ Yangi guruh</Button>
+        <Button onClick={() => { setError(''); setForm({ ...blank, ...(curator ? { tutor: me.fullName, tutorPhone: me.phone } : {}) }); }}>+ Yangi guruh</Button>
       </div>
       <Alert>{error}</Alert>
       <Card className="overflow-x-auto !p-0">

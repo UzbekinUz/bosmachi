@@ -4,3 +4,4 @@ server/data/
 client/dist
 *.log
 .brud
+.claude/

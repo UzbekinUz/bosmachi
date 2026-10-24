@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { api } from '../api.js';
+import { api, setToken } from '../api.js';
 import { Alert, Button, Field, Input, Modal } from '../components/ui.jsx';
 
 // forced = true: birinchi kirishda parolni almashtirish majburiy, oynani yopib bo'lmaydi
@@ -13,7 +13,8 @@ export default function PasswordModal({ forced, onClose, onDone }) {
     if (f.password !== f.again) return setError('Yangi parol ikki marta bir xil kiritilmadi');
     setBusy(true);
     try {
-      await api('/admin/me/password', { method: 'POST', body: { current: f.current, password: f.password } });
+      const res = await api('/admin/me/password', { method: 'POST', body: { current: f.current, password: f.password } });
+      if (res.token) setToken(res.token); // eski tokenlar bekor bo'ladi, yangisini saqlaymiz
       onDone();
     } catch (err) { setError(err.message); }
     setBusy(false);

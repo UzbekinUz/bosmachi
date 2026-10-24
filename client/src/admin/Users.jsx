@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { api } from '../api.js';
+import { api, formatPhone } from '../api.js';
 import { Alert, Button, Card, Field, Input, Modal, PageHead } from '../components/ui.jsx';
 
-const blank = { username: '', fullName: '', password: '', groups: [], active: true };
+const blank = { username: '', fullName: '', phone: '', password: '', groups: [], active: true };
 
 // Tasodifiy vaqtincha parol (o'xshash belgilarsiz)
 const randomPassword = () => {
@@ -30,7 +30,7 @@ export default function Users() {
     setError('');
     try {
       if (form._id) {
-        await api(`/admin/users/${form._id}`, { method: 'PUT', body: { fullName: form.fullName, groups: form.groups, active: form.active, password: form.password || undefined } });
+        await api(`/admin/users/${form._id}`, { method: 'PUT', body: { fullName: form.fullName, phone: form.phone, groups: form.groups, active: form.active, password: form.password || undefined } });
         if (form.password) setCreated({ username: form.username, password: form.password });
       } else {
         await api('/admin/users', { method: 'POST', body: form });
@@ -71,7 +71,7 @@ export default function Users() {
           <div key={u._id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 ${u.active ? '' : 'opacity-50'}`}>
             <div className="min-w-0 flex-1">
               <div className="font-medium text-white">{u.fullName || u.username} {u.role === 'owner' && <span className="ml-1 rounded bg-ink-700 px-1.5 py-0.5 text-xs text-brand-400">Egasi</span>}{!u.active && <span className="ml-1 text-xs text-red-300">faol emas</span>}</div>
-              <div className="text-sm text-slate-400">@{u.username}</div>
+              <div className="text-sm text-slate-400">@{u.username}{u.phone ? ` · ${u.phone}` : ''}</div>
               {u.role === 'curator' && (
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {u.groups.length ? u.groups.map((id) => <span key={id} className="rounded-full bg-ink-700 px-2.5 py-0.5 text-xs text-blue-200">{groupName(id)}</span>) : <span className="text-xs text-amber-300">Guruh biriktirilmagan</span>}
@@ -92,6 +92,7 @@ export default function Users() {
           <form onSubmit={save} className="space-y-3">
             <Field label="To‘liq ismi" required><Input value={form.fullName} onChange={(e) => setForm({ ...form, fullName: e.target.value })} placeholder="Familiya Ism Otasining ismi" required /></Field>
             <Field label="Login" required hint="Lotin harf, raqam, nuqta, defis (3-30 belgi)"><Input value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} disabled={!!form._id} autoCapitalize="none" required /></Field>
+            <Field label="Telefon raqami" required hint="Hisobot (Word) hujjatida tyutor sifatida ko‘rsatiladi"><Input type="tel" inputMode="tel" value={form.phone || ''} onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })} placeholder="+998 90 123 45 67" required /></Field>
             {form.role !== 'owner' && (
               <>
                 <Field label={form._id ? 'Yangi vaqtincha parol (ixtiyoriy)' : 'Vaqtincha parol'} required={!form._id} hint="Kurator birinchi kirishda uni o‘zgartiradi">

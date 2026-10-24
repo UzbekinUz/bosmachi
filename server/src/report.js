@@ -6,7 +6,7 @@ import {
   AlignmentType, BorderStyle, Document, Footer, HeightRule, ImageRun, LineRuleType, Packer, PageOrientation,
   Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType,
 } from 'docx';
-import { Group, Student, Submission, Photo } from './models.js';
+import { Group, Student, Submission, Photo, User } from './models.js';
 import { photoPath } from './storage.js';
 import { formatName } from './format.js';
 
@@ -202,7 +202,7 @@ async function titleSection(tutors, year) {
   };
 }
 
-function summarySection(subs, tutors) {
+function summarySection(subs, people) {
   const count = (name) => subs.filter((s) => lower(s.rentStatus) === name).length;
   const widths = [tw(11), tw(4.5), tw(4.5), tw(4.5)];
   const cell = (text, i, bold) => new TableCell({
@@ -221,7 +221,7 @@ function summarySection(subs, tutors) {
       new TableRow({ cantSplit: true, children: [subs.length, count('yashil'), count('sariq'), count('qizil')].map((t, i) => cell(t, i, true)) }),
     ],
   });
-  const tutor = tutors.length ? tutors.join(', ') : '____________________';
+  const tutor = people.length ? people.map((p) => (p.phone ? `${p.name}, tel: ${p.phone}` : p.name)).join('; ') : '____________________';
   return {
     properties: { page: PAGE },
     children: [
@@ -237,12 +237,20 @@ function summarySection(subs, tutors) {
 
 export async function buildReportDoc({ groupIds, missing = 'placeholder' }) {
   const { groups, pages, subs } = await collect(groupIds);
-  const tutors = [...new Set(groups.map((g) => formatName(g.tutor)).filter(Boolean))];
+  // Tyutor: guruhdagi ma'lumot, bo'sh bo'lsa — guruh biriktirilgan kuratorning profili (ism va telefon)
+  const curators = await User.find({ role: 'curator', groups: { $in: groups.map((g) => g._id) } }).lean();
+  const people = [];
+  for (const g of groups) {
+    const c = curators.find((u) => u.groups.some((id) => String(id) === String(g._id)));
+    const name = formatName(g.tutor || c?.fullName || '');
+    if (name && !people.some((p) => p.name === name)) people.push({ name, phone: g.tutorPhone || c?.phone || '' });
+  }
+  const tutors = people.map((p) => p.name);
   const use = missing === 'skip' ? pages.filter((p) => p.source.photos.length === 4) : pages;
 
   const sections = [await titleSection(tutors, new Date().getFullYear())];
   for (const p of use) sections.push(await studentSection(p));
-  sections.push(summarySection(subs, tutors));
+  sections.push(summarySection(subs, people));
 
   const doc = new Document({
     creator: 'Bosmachi',

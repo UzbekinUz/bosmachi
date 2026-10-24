@@ -1,24 +1,21 @@
 import { useEffect, useState } from 'react';
 import { api } from './api.js';
 
-// Rasmni brauzerda siqish: 4:3 ga kesish, eng ko'pi bilan 1600px, JPEG ~0.8
-export async function compressImage(file) {
+// Yuklashdan oldin asl rasmni yengillashtiramiz: EXIF yo'nalishi qo'llanadi, uzun tomoni <= 2400px, JPEG 0.85.
+// Kesilmaydi: qaysi qismini olish alohida ko'rsatiladi, asl rasm serverda saqlanadi.
+export async function prepareOriginal(file) {
   const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
-  const { width: w, height: h } = bmp;
-  let cw = w;
-  let ch = Math.round((w * 3) / 4);
-  if (ch > h) { ch = h; cw = Math.round((h * 4) / 3); }
-  const scale = Math.min(1, 1600 / cw);
+  const scale = Math.min(1, 2400 / Math.max(bmp.width, bmp.height));
   const canvas = document.createElement('canvas');
-  canvas.width = Math.round(cw * scale);
-  canvas.height = Math.round(ch * scale);
+  canvas.width = Math.round(bmp.width * scale);
+  canvas.height = Math.round(bmp.height * scale);
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = '#fff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(bmp, (w - cw) / 2, (h - ch) / 2, cw, ch, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
   bmp.close?.();
   return new Promise((resolve, reject) => {
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Rasmni siqib bo‘lmadi'))), 'image/jpeg', 0.8);
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Rasmni tayyorlab bo‘lmadi'))), 'image/jpeg', 0.85);
   });
 }
 
@@ -31,7 +28,7 @@ export function useAuthImage(id, version, variant = 'thumb') {
     if (!id) return undefined;
     if (cache.has(key)) { setUrl(cache.get(key)); return undefined; }
     let alive = true;
-    api(`/admin/photos/${id}/file?v=${variant}`, { raw: true })
+    api(`/admin/photos/${id}/file?v=${variant}&t=${encodeURIComponent(version || 0)}`, { raw: true })
       .then((blob) => {
         const u = URL.createObjectURL(blob);
         cache.set(key, u);

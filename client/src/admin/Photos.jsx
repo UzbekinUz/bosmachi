@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { api, upload } from '../api.js';
-import { compressImage, useAuthImage } from '../photoUtils.js';
+import { prepareOriginal, useAuthImage } from '../photoUtils.js';
 import { Alert, Button, Card, Field, Info, Input, Modal, PageHead, Select } from '../components/ui.jsx';
 import CropModal from '../components/CropModal.jsx';
 
@@ -40,7 +40,7 @@ function Slot({ n, photo, busy, onPick, onRecrop, onRemove, onOpen }) {
       <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; if (f) onPick(f); }} />
       {photo && (
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="ghost" className="!min-h-10 !px-2 text-[13px]" disabled={busy} onClick={onRecrop} title="Rasmning qaysi qismi ko‘rinishini o‘zgartirish">Kesish</Button>
+          <Button variant="ghost" className="!min-h-10 !px-2 text-[13px]" disabled={busy} onClick={onRecrop} title="Asl rasmdan qaysi qismi ko‘rinishini o‘zgartirish">Kesish</Button>
           <Button variant="ghost" className="!min-h-10 !px-2 text-[13px]" disabled={busy} onClick={() => input.current?.click()} title="Boshqa rasm bilan almashtirish">Almashtirish</Button>
         </div>
       )}
@@ -102,11 +102,12 @@ function StudentModal({ student, onClose, onChanged }) {
   const bySlot = Object.fromEntries(student.photos.map((p) => [p.slot, p]));
   const setBusyFor = (slot, v) => setBusy((b) => ({ ...b, [slot]: v }));
 
-  // Tayyor (kesilgan) rasmni yuboradi
-  const put = async (slot, blob) => {
+  // Asl rasmni (va ixtiyoriy kesim to'rtburchagini) yuboradi; kesimni server asl rasmdan bajaradi
+  const put = async (slot, blob, rect) => {
     setBusyFor(slot, true);
     try {
       const fd = new FormData();
+      if (rect) fd.append('crop', JSON.stringify(rect));
       fd.append('photo', blob, `${slot}.jpg`);
       await upload(`/admin/students/${student._id}/photos/${slot}`, fd);
       setError('');
@@ -116,16 +117,31 @@ function StudentModal({ student, onClose, onChanged }) {
   };
 
   // Yangi fayl tanlanganda avval kesish oynasi ochiladi
-  const startCrop = (slot, source) => { setError(''); setCrop({ slot, source }); };
+  const startCrop = async (slot, file) => {
+    setError('');
+    setBusyFor(slot, true);
+    try { setCrop({ slot, source: await prepareOriginal(file), initial: null, mode: 'upload' }); } catch (e) { setError(e.message); }
+    setBusyFor(slot, false);
+  };
 
   // Mavjud rasmni qayta kesish: to'liq nusxani olib kesish oynasiga beramiz
   const recrop = async (slot) => {
     setBusyFor(slot, true);
     try {
-      const blob = await api(`/admin/photos/${bySlot[slot].id}/file?v=full`, { raw: true });
-      setCrop({ slot, source: blob });
+      const blob = await api(`/admin/photos/${bySlot[slot].id}/file?v=original&t=${encodeURIComponent(bySlot[slot].updatedAt)}`, { raw: true });
+      setCrop({ slot, source: blob, initial: bySlot[slot].crop, mode: 'recrop' });
     } catch (e) { setError(e.message); }
     setBusyFor(slot, false);
+  };
+
+  const saveCrop = async (slot, rect) => {
+    setBusyFor(slot, true);
+    try {
+      await api(`/admin/students/${student._id}/photos/${slot}/crop`, { method: 'PUT', body: rect });
+      setError('');
+    } catch (e) { setError(e.message); }
+    setBusyFor(slot, false);
+    onChanged();
   };
 
   const remove = async (slot) => {
@@ -142,7 +158,7 @@ function StudentModal({ student, onClose, onChanged }) {
     const list = [...files];
     if (list.length > free.length) setError(`Bo‘sh joy ${free.length} ta, ortiqcha ${list.length - free.length} ta rasm olinmadi`);
     for (const [i, slot] of free.slice(0, list.length).entries()) {
-      try { await put(slot, await compressImage(list[i])); } catch (e) { setError(e.message); } // eslint-disable-line no-await-in-loop
+      try { await put(slot, await prepareOriginal(list[i])); } catch (e) { setError(e.message); } // eslint-disable-line no-await-in-loop
     }
   };
 
@@ -165,16 +181,21 @@ function StudentModal({ student, onClose, onChanged }) {
         ))}
       </div>
       <p className="mt-4 text-[13px] leading-relaxed text-slate-400">
-        Eshik, oshxona kabi xonadon ichidan olingan 4 ta rasmni yuklang. Yuklashda rasmning qaysi qismi qolishini o‘zingiz tanlaysiz; keyin ham <b className="text-slate-200">Kesish</b> tugmasi bilan o‘zgartirish mumkin.
+        Eshik, oshxona kabi xonadon ichidan olingan 4 ta rasmni yuklang. Yuklashda rasmning qaysi qismi qolishini o‘zingiz tanlaysiz; keyin ham <b className="text-slate-200">Kesish</b> tugmasi bilan o‘zgartirish mumkin: asl rasm saqlanadi, qirqib tashlangan qismlar ham qaytadi.
       </p>
 
       {big && <BigImage photo={big} title={student.fullName} onClose={() => setBig(null)} />}
       <AnimatePresence>
         {crop && (
           <CropModal
-            key={crop.slot} source={crop.source} title={`${crop.slot}-rasmni kesish`}
+            key={crop.slot} source={crop.source} initial={crop.initial} title={`${crop.slot}-rasmni kesish`}
             onCancel={() => setCrop(null)}
-            onDone={(blob) => { const slot = crop.slot; setCrop(null); put(slot, blob); }}
+            onDone={(rect) => {
+              const { slot, source, mode } = crop;
+              setCrop(null);
+              if (mode === 'upload') put(slot, source, rect);
+              else saveCrop(slot, rect);
+            }}
           />
         )}
       </AnimatePresence>

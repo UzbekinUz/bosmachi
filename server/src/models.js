@@ -9,6 +9,7 @@ const Group = model('Group', new Schema({
   course: { type: String, required: true, trim: true }, // 2-kurs
   tutor: { type: String, default: '', trim: true },
   tutorPhone: { type: String, default: '', trim: true },
+  createdBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
 }, { timestamps: true }));
 
 const Student = model('Student', new Schema({
@@ -64,6 +65,8 @@ const Photo = model('Photo', new Schema({
   slot: { type: Number, required: true, min: 1, max: 4 },
   file: { type: String, required: true }, // "<talabaId>/<slot>" — kengaytma va o'lcham nomi storage.js'da
   size: { type: Number, default: 0 },
+  // Asl rasmdan qaysi qismi olingani (0..1 ulushlar). Bo'sh bo'lsa — markazdan avtomatik kesilgan
+  crop: { x: Number, y: Number, w: Number, h: Number, _id: false },
 }, { timestamps: true }));
 Photo.schema.index({ student: 1, slot: 1 }, { unique: true });
 
@@ -76,6 +79,20 @@ const User = model('User', new Schema({
   groups: [{ type: Schema.Types.ObjectId, ref: 'Group' }],
   active: { type: Boolean, default: true },
   mustChangePassword: { type: Boolean, default: false },
+  phone: { type: String, default: '', trim: true }, // hujjatlarda (hisobot) ishlatiladi
+  tokenVersion: { type: Number, default: 0 }, // oshirilsa, eski tokenlar ishlamay qoladi
+  lastLoginAt: Date,
+  lastActiveAt: Date,
 }, { timestamps: true }));
 
-export { Group, Student, Option, FieldConfig, Submission, Photo, User };
+const AuditLog = model('AuditLog', new Schema({
+  user: { type: Schema.Types.ObjectId, ref: 'User', index: true },
+  username: String,
+  fullName: String,
+  action: { type: String, index: true },
+  summary: String,
+  group: { type: Schema.Types.ObjectId, ref: 'Group', default: null },
+  at: { type: Date, default: Date.now, index: true, expires: 60 * 60 * 24 * 180 },
+}));
+
+export { Group, Student, Option, FieldConfig, Submission, Photo, User, AuditLog };
