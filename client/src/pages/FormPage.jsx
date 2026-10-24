@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { api, formatPhone } from '../api.js';
-import { Alert, Button, Card, Field, Input, Item, Logo, Picker, Stagger } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Logo, Picker } from '../components/ui.jsx';
 import MapPicker, { mapsLink } from '../components/MapPicker.jsx';
 
 const REGION = 'Toshkent shahar';
@@ -10,15 +10,15 @@ const emptyForm = { phone: '', landlordName: '', landlordPhone: '', region: REGI
 const emptyPerson = { info: '', fullName: '', phone: '' };
 
 const Section = ({ title, hint, children }) => (
-  <Item as="section">
+  <section>
     <Card className="space-y-4">
       <div>
-        <h2 className="font-serif text-xl font-semibold text-white">{title}</h2>
-        {hint && <p className="mt-1 text-[14px] leading-snug text-slate-300">{hint}</p>}
+        <h2 className="text-base font-semibold text-white">{title}</h2>
+        {hint && <p className="mt-1 text-sm leading-snug text-slate-300">{hint}</p>}
       </div>
       {children}
     </Card>
-  </Item>
+  </section>
 );
 
 const Collapse = ({ show, children }) => (
@@ -91,42 +91,32 @@ export default function FormPage() {
   const hasAddress = ['region', 'district', 'mahalla', 'street', 'house', 'apartment', 'location'].some((k) => fieldMap[k]);
 
   return (
-    <div>
-      <div className="bg-brand-600">
-        <div className="mx-auto max-w-xl px-4 pb-9 pt-5 sm:pt-8">
-          <motion.header initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-9 flex items-center justify-between">
-            <Logo inverse />
-            <Link to="/admin" className="rounded-lg px-2 py-1.5 text-sm text-blue-100 transition hover:text-white">Admin</Link>
-          </motion.header>
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <h1 className="font-serif text-4xl font-semibold leading-[1.05] text-white sm:text-5xl">Ijara ma’lumotlari</h1>
-            {!done && <p className="mt-3 max-w-md text-[16px] leading-relaxed text-blue-50">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>}
-          </motion.div>
+    <div className="min-h-screen">
+      <header className="border-b border-[var(--rule)]">
+        <div className="mx-auto flex h-12 max-w-xl items-center justify-between px-4">
+          <Logo />
+          <Link to="/admin" className="rounded-full px-2 py-1.5 text-sm text-slate-300 transition hover:text-white">Admin</Link>
         </div>
-      </div>
+      </header>
 
-      <div className="mx-auto max-w-xl px-4 pb-32 pt-6">
-      {!cfg && !error && <p className="py-10 text-center text-slate-400">Yuklanmoqda…</p>}
+      <main className="mx-auto max-w-xl px-4 pb-32 pt-8">
+        <h1 className="text-2xl font-semibold text-white">Ijara ma’lumotlari</h1>
+        {!done && <p className="mb-6 mt-1 text-[15px] leading-relaxed text-slate-300">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>}
 
-      <AnimatePresence mode="wait">
+        {!cfg && !error && <p className="py-10 text-center text-slate-400">Yuklanmoqda…</p>}
+
         {done ? (
-          <motion.div key="done" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}>
-            <Card className="py-12 text-center">
-              <motion.div
-                initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }}
-                className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-300"
-              >
-                <svg viewBox="0 0 24 24" className="h-8 w-8" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <motion.path d="M5 12.5l4.5 4.5L19 7.5" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ delay: 0.25, duration: 0.45 }} />
-                </svg>
-              </motion.div>
-              <h2 className="text-xl font-semibold text-white">Rahmat! Ma’lumotlaringiz qabul qilindi</h2>
-              <p className="mt-1 text-sm text-slate-400">Xatolik bo‘lsa, guruh tyutoringizga murojaat qiling.</p>
-              <Button className="mt-7" onClick={reset}>Yangi forma</Button>
-            </Card>
-          </motion.div>
+          <Card className="mt-6 py-10 text-center">
+            <svg className="mx-auto mb-4 h-10 w-10 text-positive" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="9.5" />
+              <motion.path d="M7.5 12.5l3 3 6-7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.35 }} />
+            </svg>
+            <h2 className="text-lg font-semibold text-white">Ma’lumotlaringiz qabul qilindi</h2>
+            <p className="mt-1 text-sm text-slate-300">Xatolik bo‘lsa, guruh tyutoringizga murojaat qiling.</p>
+            <Button variant="ghost" className="mt-6" onClick={reset}>Yangi forma to‘ldirish</Button>
+          </Card>
         ) : cfg && (
-          <Stagger as="form" key="form" onSubmit={submit} className="space-y-4">
+          <form onSubmit={submit} className="space-y-4">
             <Section title="Talaba" hint="Guruhingizni, so‘ng ro‘yxatdan ismingizni tanlang. Ismingiz topilmasa, guruh tyutoringizga murojaat qiling.">
               <Field label="Guruh" required>
                 <Picker
@@ -138,9 +128,9 @@ export default function FormPage() {
 
               <Collapse show={!!group}>
                 {group && (
-                  <dl className="grid grid-cols-2 gap-x-3 gap-y-2.5 rounded-lg border border-ink-600/60 bg-ink-900/60 p-3 text-sm">
+                  <dl className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-[14px] bg-ink-700 p-4 text-sm">
                     {[['Fakultet', group.faculty], ['Yo‘nalish', group.direction], ['Kurs', group.course], ['Guruh tyutori', group.tutor || '—']].map(([k, v]) => (
-                      <div key={k}><dt className="text-xs text-slate-400">{k}</dt><dd className="font-medium text-blue-100">{v}</dd></div>
+                      <div key={k}><dt className="text-xs text-slate-300">{k}</dt><dd className="font-medium text-white">{v}</dd></div>
                     ))}
                   </dl>
                 )}
@@ -155,7 +145,7 @@ export default function FormPage() {
                 />
               </Field>
               <Collapse show={!!groupId && !students.length}>
-                <p className="text-sm text-amber-300">Bu guruhda formani to‘ldirmagan talaba qolmagan.</p>
+                <p className="text-sm text-warning">Bu guruhda formani to‘ldirmagan talaba qolmagan.</p>
               </Collapse>
             </Section>
 
@@ -178,8 +168,7 @@ export default function FormPage() {
             </Section>
 
             {fieldMap.cohabitants && (
-              <Section title={`${lbl('cohabitants')}${req('cohabitants') ? ' *' : ''}`} hint="Siz bilan bir xonadonda yashaydigan boshqa odamlar. Har biri uchun kim ekanini (masalan: TDPI talabasi), to‘liq ismi va telefonini yozing.">
-                <p className="-mt-1 text-xs text-slate-400">Yolg‘iz yashasangiz, bo‘sh qoldiring.</p>
+              <Section title={`${lbl('cohabitants')}${req('cohabitants') ? ' *' : ''}`} hint="Siz bilan bir xonadonda yashaydigan boshqa odamlar. Har biri uchun kim ekanini (masalan: TDPI talabasi), to‘liq ismi va telefonini yozing. Yolg‘iz yashasangiz, bo‘sh qoldiring.">
                 <AnimatePresence initial={false}>
                   {people.map((p, i) => (
                     <motion.div
@@ -188,10 +177,10 @@ export default function FormPage() {
                       initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                       className="overflow-hidden"
                     >
-                      <div className="space-y-3 rounded-lg border border-ink-600/60 bg-ink-900/50 p-3">
+                      <div className="space-y-3 rounded-[14px] bg-ink-700 p-3.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-slate-300">{i + 1}-shaxs</span>
-                          <button type="button" onClick={() => setPeople(people.filter((x) => x.id !== p.id))} className="rounded-md px-2 py-1 text-sm text-red-300 transition hover:bg-red-500/10">O‘chirish</button>
+                          <span className="text-sm font-medium text-white">{i + 1}-shaxs</span>
+                          <button type="button" onClick={() => setPeople(people.filter((x) => x.id !== p.id))} className="min-h-9 rounded-full px-3 text-sm text-negative transition hover:bg-negative/10">O‘chirish</button>
                         </div>
                         <Input placeholder="Kim ekanligi (masalan: TDPI talabasi)" value={p.info} onChange={(e) => setPerson(i, { info: e.target.value })} />
                         <Input placeholder="Familiya Ism Otasining ismi" value={p.fullName} onChange={(e) => setPerson(i, { fullName: e.target.value })} />
@@ -200,7 +189,7 @@ export default function FormPage() {
                     </motion.div>
                   ))}
                 </AnimatePresence>
-                <Button type="button" variant="ghost" className="w-full" onClick={() => setPeople([...people, { ...emptyPerson, id: crypto.randomUUID() }])}>+ Shaxs qo‘shish</Button>
+                <Button type="button" variant="ghost" className="w-full" onClick={() => setPeople([...people, { ...emptyPerson, id: crypto.randomUUID() }])}>Shaxs qo‘shish</Button>
               </Section>
             )}
 
@@ -236,9 +225,9 @@ export default function FormPage() {
                 {fieldMap.location && (
                   <Field label={lbl('location')} required={req('location')} hint="Havolani kiriting yoki xaritadan belgilang">
                     <Input type="url" inputMode="url" value={form.location} onChange={set('location')} placeholder="https://maps.google.com/…" required={req('location')} />
-                    <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                      <Button type="button" variant="ghost" onClick={() => setMapOpen(true)}>📍 Xaritadan belgilash</Button>
-                      <Button type="button" variant="ghost" onClick={locate} disabled={locating}>{locating ? 'Aniqlanmoqda…' : '🎯 Joriy joylashuvim'}</Button>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      <Button type="button" variant="ghost" onClick={() => setMapOpen(true)}>Xaritadan belgilash</Button>
+                      <Button type="button" variant="ghost" onClick={locate} disabled={locating}>{locating ? 'Aniqlanmoqda…' : 'Joriy joylashuvim'}</Button>
                     </div>
                   </Field>
                 )}
@@ -247,20 +236,19 @@ export default function FormPage() {
 
             <Alert>{error}</Alert>
 
-            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-700 bg-ink-950 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[var(--rule)] bg-ink-950 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
               <div className="mx-auto max-w-xl">
                 <Button type="submit" disabled={busy || !studentId} className="w-full !min-h-12 text-base">{busy ? 'Yuborilmoqda…' : 'Yuborish'}</Button>
               </div>
             </div>
-          </Stagger>
+          </form>
         )}
-      </AnimatePresence>
 
-      {!cfg && error && <Alert>{error}</Alert>}
+        {!cfg && error && <Alert>{error}</Alert>}
+      </main>
       <AnimatePresence>
         {mapOpen && <MapPicker value={form.location} onClose={() => setMapOpen(false)} onSelect={(link) => setForm((f) => ({ ...f, location: link }))} />}
       </AnimatePresence>
-      </div>
     </div>
   );
 }

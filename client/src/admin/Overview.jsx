@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Field, PageHead, Select } from '../components/ui.jsx';
+import { Alert, Avatar, Button, Field, Kpis, Meter, PageHead, Pill, Select, Tabs } from '../components/ui.jsx';
+
+export const BOSHQARUV_TABS = [
+  { to: '/admin/overview', label: 'Holat' },
+  { to: '/admin/users', label: 'Kuratorlar' },
+];
 
 const pct = (a, b) => (b ? Math.round((a / b) * 100) : 0);
 const ACTION = {
@@ -22,21 +27,14 @@ const ago = (d) => {
   return `${Math.round(m / 1440)} kun oldin`;
 };
 const daysIdle = (d) => (d ? (Date.now() - new Date(d)) / 86400000 : Infinity);
-
-function Bar({ value, total, tone = 'bg-brand-500' }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="h-2 w-24 overflow-hidden rounded-full bg-ink-700"><div className={`h-full rounded-full ${tone}`} style={{ width: `${pct(value, total)}%` }} /></div>
-      <span className="w-20 text-sm text-slate-200">{value}/{total} <span className="text-slate-400">({pct(value, total)}%)</span></span>
-    </div>
-  );
-}
+const GRID = 'lg:grid lg:grid-cols-[minmax(0,2fr)_5rem_minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-5';
 
 export default function Overview() {
   const [data, setData] = useState(null);
   const [log, setLog] = useState([]);
   const [who, setWho] = useState('');
   const [open, setOpen] = useState({});
+  const [more, setMore] = useState(false);
   const [error, setError] = useState('');
 
   const loadOverview = () => api('/admin/overview').then(setData).catch((e) => setError(e.message));
@@ -45,106 +43,118 @@ export default function Overview() {
   useEffect(() => { loadLog(); }, [who]); // eslint-disable-line
 
   const refresh = () => { loadOverview(); loadLog(); };
-  const idle = (data?.curators || []).filter((c) => c.active && daysIdle(c.lastActiveAt) >= 7);
+  const curators = data?.curators || [];
+  const idle = curators.filter((c) => c.active && daysIdle(c.lastActiveAt) >= 7);
+  const total = curators.reduce((a, c) => ({
+    groups: a.groups + c.totals.groups, students: a.students + c.totals.students, submitted: a.submitted + c.totals.submitted,
+  }), { groups: 0, students: 0, submitted: 0 });
+  const slowest = [...curators].filter((c) => c.totals.students).sort((a, b) => pct(a.totals.submitted, a.totals.students) - pct(b.totals.submitted, b.totals.students))[0];
+
+  let finding;
+  if (idle.length) finding = `${idle.map((c) => c.fullName).join(', ')} 7 kundan beri tizimda faol bo‘lmagan.`;
+  else if (slowest && pct(slowest.totals.submitted, slowest.totals.students) < 100) finding = `${slowest.fullName} guruhlarida forma to‘ldirish eng orqada: ${pct(slowest.totals.submitted, slowest.totals.students)}%.`;
 
   return (
-    <div className="space-y-6">
+    <div>
       <PageHead
         title="Boshqaruv"
+        finding={finding}
+        actions={<Button variant="ghost" onClick={refresh}>Yangilash</Button>}
         steps={[
           'Har bir kurator uchun guruhlar soni, talabalar, formani to‘ldirganlar va 4 ta rasmi to‘liq talabalar ulushi ko‘rinadi.',
-          'Kurator ismiga bossangiz, uning har bir guruhi bo‘yicha batafsil holat ochiladi: qaysi guruhda ish orqada ekanini darhol ko‘rasiz.',
-          '"Biriktirilmagan guruhlar" ro‘yxati hech bir kuratorga berilmagan guruhlarni ko‘rsatadi. Ularni Kuratorlar bo‘limida biriktiring.',
+          'Kurator qatoriga bossangiz, uning har bir guruhi bo‘yicha batafsil holat ochiladi: qaysi guruhda ish orqada ekanini darhol ko‘rasiz.',
+          '"Biriktirilmagan guruhlar" hech bir kuratorga berilmagan guruhlarni ko‘rsatadi. Ularni Kuratorlar bo‘limida biriktiring.',
           'Faoliyat jurnali: kim, qachon, nima qilgani (kirish, rasm yuklash, ma’lumotni o‘zgartirish, hisobot olish). Kurator bo‘yicha saralash mumkin.',
         ]}
       >
         Kuratorlar ishini va ularning guruhlarini bir joydan kuzating.
       </PageHead>
-      <div className="-mt-3 flex justify-end"><Button variant="ghost" onClick={refresh}>↻ Yangilash</Button></div>
+      <Tabs items={BOSHQARUV_TABS} />
       <Alert>{error}</Alert>
 
-      {idle.length > 0 && (
-        <div className="rounded-lg bg-amber-500/10 px-4 py-3 text-[15px] text-amber-200">
-          Diqqat: {idle.map((c) => c.fullName).join(', ')} — 7 kundan ortiq tizimda faol bo‘lmagan.
-        </div>
-      )}
+      <div className="grid gap-x-6 gap-y-10 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
+          <Kpis items={[
+            { label: 'Kuratorlar', value: curators.length, caption: `${curators.filter((c) => c.active).length} tasi faol` },
+            { label: 'Guruhlar', value: total.groups, caption: data?.unassigned.length ? `${data.unassigned.length} tasi biriktirilmagan` : 'hammasi biriktirilgan' },
+            { label: 'Talabalar', value: total.students, caption: 'kuratorlar guruhlarida' },
+            { label: 'Forma to‘ldirgan', value: `${pct(total.submitted, total.students)}%`, caption: `${total.submitted} / ${total.students} talaba` },
+          ]} />
 
-      <section className="space-y-3">
-        <h2 className="font-serif text-2xl font-semibold text-white">Kuratorlar</h2>
-        <Card className="divide-y divide-ink-700/60 !p-0">
-          {(data?.curators || []).map((c) => (
-            <div key={c._id} className={c.active ? '' : 'opacity-50'}>
-              <button type="button" onClick={() => setOpen({ ...open, [c._id]: !open[c._id] })} className="grid w-full gap-x-6 gap-y-2 px-4 py-4 text-left transition hover:bg-ink-700/40 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-                <span>
-                  <span className="block font-medium text-white">{c.fullName}{!c.active && <span className="ml-2 text-xs text-red-300">faol emas</span>}</span>
-                  <span className="block text-sm text-slate-400">@{c.username}{c.phone ? ` · ${c.phone}` : ''}</span>
-                  <span className="block text-[13px] text-slate-400">Oxirgi faollik: {ago(c.lastActiveAt)}</span>
-                </span>
-                <span><span className="block text-[13px] text-slate-400">Guruhlar / talabalar</span><span className="text-slate-100">{c.totals.groups} / {c.totals.students}</span></span>
-                <span><span className="mb-1 block text-[13px] text-slate-400">Forma to‘ldirgan</span><Bar value={c.totals.submitted} total={c.totals.students} /></span>
-                <span><span className="mb-1 block text-[13px] text-slate-400">Rasmlari to‘liq (4/4)</span><Bar value={c.totals.photosComplete} total={c.totals.submitted} tone="bg-emerald-400" /></span>
-              </button>
-              {open[c._id] && (
-                <div className="bg-ink-900 px-4 py-3">
-                  {c.groupList.length ? (
-                    <ul className="space-y-2">
-                      {c.groupList.map((g) => (
-                        <li key={g._id} className="grid items-center gap-x-6 gap-y-1 text-[15px] lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-                          <span className="font-medium text-blue-200">{g.index}</span>
-                          <span className="text-slate-300">{g.students} talaba</span>
-                          <Bar value={g.submitted} total={g.students} />
-                          <Bar value={g.photosComplete} total={g.submitted} tone="bg-emerald-400" />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : <p className="text-sm text-amber-300">Guruh biriktirilmagan</p>}
-                </div>
-              )}
+          <h2 className="mb-1 mt-10 text-base font-semibold text-white">Kuratorlar</h2>
+          <p className="mb-3 text-sm text-slate-300">Guruhlar bo‘yicha forma va rasm holati.</p>
+          <div role="table" aria-label="Kuratorlar">
+            <div role="row" className={`${GRID} hidden border-b border-[var(--rule)] pb-2 text-xs text-slate-400 lg:grid`}>
+              <span>Kurator</span><span className="text-right">Guruh</span><span>Forma to‘ldirgan</span><span>Rasmlari to‘liq</span>
             </div>
-          ))}
-          {data && !data.curators.length && <p className="px-4 py-10 text-center text-slate-400">Hali kurator yo‘q. Kuratorlar bo‘limida yarating.</p>}
-        </Card>
-      </section>
-
-      {data?.unassigned.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="font-serif text-2xl font-semibold text-white">Biriktirilmagan guruhlar</h2>
-          <Card className="divide-y divide-ink-700/60 !p-0">
-            {data.unassigned.map((g) => (
-              <div key={g._id} className="grid items-center gap-x-6 gap-y-1 px-4 py-3 text-[15px] lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-                <span className="font-medium text-blue-200">{g.index}</span>
-                <span className="text-slate-300">{g.students} talaba</span>
-                <Bar value={g.submitted} total={g.students} />
-                <Bar value={g.photosComplete} total={g.submitted} tone="bg-emerald-400" />
+            {curators.map((c) => (
+              <div key={c._id} className={`border-b border-[var(--rule)] ${c.active ? '' : 'opacity-60'}`}>
+                <button type="button" onClick={() => setOpen({ ...open, [c._id]: !open[c._id] })} aria-expanded={!!open[c._id]} className={`${GRID} flex w-full flex-col items-stretch gap-2 py-3 text-left transition hover:bg-ink-800 lg:min-h-[72px]`}>
+                  <span className="flex min-w-0 items-center gap-3">
+                    <Avatar name={c.fullName} size={36} />
+                    <span className="min-w-0">
+                      <span className="block truncate font-medium text-white">{c.fullName}{!c.active && <Pill tone="negative" className="ml-2 align-middle">faol emas</Pill>}</span>
+                      <span className="block text-[13px] text-slate-300 lg:truncate">@{c.username}{c.phone ? ` · ${c.phone}` : ''}</span>
+                      <span className="block text-[13px] text-slate-400">Oxirgi faollik: {ago(c.lastActiveAt)}</span>
+                    </span>
+                  </span>
+                  <span className="text-sm tabular-nums text-slate-200 lg:text-right">{c.totals.groups} ta guruh</span>
+                  <Meter value={c.totals.submitted} total={c.totals.students} />
+                  <Meter value={c.totals.photosComplete} total={c.totals.submitted} />
+                </button>
+                {open[c._id] && (
+                  <div className="mb-3 rounded-[14px] bg-ink-800 px-4 py-2">
+                    {c.groupList.length ? c.groupList.map((g) => (
+                      <div key={g._id} className={`${GRID} flex flex-col gap-1.5 border-b border-[var(--rule)] py-2.5 text-sm last:border-0`}>
+                        <span className="font-medium text-white">{g.index}</span>
+                        <span className="tabular-nums text-slate-200 lg:text-right">{g.students} talaba</span>
+                        <Meter value={g.submitted} total={g.students} />
+                        <Meter value={g.photosComplete} total={g.submitted} />
+                      </div>
+                    )) : <p className="py-2 text-sm text-warning">Guruh biriktirilmagan</p>}
+                  </div>
+                )}
               </div>
             ))}
-          </Card>
-        </section>
-      )}
-
-      <section className="space-y-3">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <h2 className="font-serif text-2xl font-semibold text-white">Faoliyat jurnali</h2>
-          <div className="w-60">
-            <Field label="Kurator">
-              <Select value={who} onChange={(e) => setWho(e.target.value)}>
-                <option value="">Hammasi</option>
-                {(data?.curators || []).map((c) => <option key={c._id} value={c._id}>{c.fullName}</option>)}
-              </Select>
-            </Field>
+            {data && !curators.length && <p className="rounded-[14px] border border-dashed border-ink-600 px-4 py-8 text-center text-sm text-slate-400">Hali kurator yo‘q. “Kuratorlar” tabida yarating.</p>}
           </div>
+
+          {data?.unassigned.length > 0 && (
+            <>
+              <h2 className="mb-1 mt-10 text-base font-semibold text-white">Biriktirilmagan guruhlar</h2>
+              <p className="mb-3 text-sm text-slate-300">Hech bir kuratorga berilmagan, ularni siz boshqarasiz.</p>
+              {data.unassigned.map((g) => (
+                <div key={g._id} className={`${GRID} flex flex-col gap-1.5 border-b border-[var(--rule)] py-3`}>
+                  <span className="font-medium text-white">{g.index}</span>
+                  <span className="text-sm tabular-nums text-slate-200 lg:text-right">{g.students} talaba</span>
+                  <Meter value={g.submitted} total={g.students} />
+                  <Meter value={g.photosComplete} total={g.submitted} />
+                </div>
+              ))}
+            </>
+          )}
         </div>
-        <Card className="divide-y divide-ink-700/60 !p-0">
-          {log.map((l) => (
-            <div key={l._id} className="flex flex-wrap items-baseline gap-x-4 gap-y-0.5 px-4 py-2.5 text-[15px]">
-              <span className="w-36 shrink-0 text-[13px] text-slate-400">{new Date(l.at).toLocaleString('uz-UZ', { dateStyle: 'short', timeStyle: 'short' })}</span>
-              <span className="w-40 shrink-0 font-medium text-white">{l.fullName || l.username}</span>
-              <span className="min-w-0 flex-1 text-slate-200"><b className="font-medium text-blue-200">{ACTION[l.action] || l.action}</b>{l.summary ? ` · ${l.summary}` : ''}</span>
-            </div>
-          ))}
-          {!log.length && <p className="px-4 py-10 text-center text-slate-400">Hozircha faoliyat yo‘q</p>}
-        </Card>
-      </section>
+
+        <aside className="min-w-0">
+          <h2 className="mb-3 text-base font-semibold text-white">Faoliyat jurnali</h2>
+          <Field label="Kurator">
+            <Select value={who} onChange={(e) => setWho(e.target.value)}>
+              <option value="">Hammasi</option>
+              {curators.map((c) => <option key={c._id} value={c._id}>{c.fullName}</option>)}
+            </Select>
+          </Field>
+          <ul className="mt-3">
+            {(more ? log : log.slice(0, 8)).map((l) => (
+              <li key={l._id} className="border-b border-[var(--rule)] py-2.5 text-sm">
+                <div className="flex items-baseline justify-between gap-3"><span className="font-medium text-white">{l.fullName || l.username}</span><span className="shrink-0 text-xs text-slate-400">{ago(l.at)}</span></div>
+                <div className="text-slate-300">{ACTION[l.action] || l.action}{l.summary && l.action !== 'login' ? ` · ${l.summary}` : ''}</div>
+              </li>
+            ))}
+            {!log.length && <li className="rounded-[14px] border border-dashed border-ink-600 px-3 py-6 text-center text-sm text-slate-400">Hozircha faoliyat yo‘q</li>}
+          </ul>
+          {log.length > 8 && <Button variant="ghost" className="mt-3 w-full" onClick={() => setMore(!more)}>{more ? 'Kamroq ko‘rsatish' : `Hammasini ko‘rish (${log.length})`}</Button>}
+        </aside>
+      </div>
     </div>
   );
 }

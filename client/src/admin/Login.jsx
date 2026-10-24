@@ -7,37 +7,52 @@ export default function Login() {
   const nav = useNavigate();
   const [f, setF] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
+    setBusy(true);
     try {
       const { token } = await api('/auth/login', { method: 'POST', body: f });
       setToken(token);
       nav('/admin');
     } catch (err) { setError(err.message); }
+    setBusy(false);
   };
 
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <div className="hidden bg-brand-600 p-12 lg:flex lg:flex-col lg:justify-between">
-        <Logo inverse />
-        <p className="max-w-md font-serif text-5xl font-semibold leading-[1.05] text-white">Talabalar ijarasi: bitta jadvalda, tartib bilan.</p>
-        <p className="max-w-sm text-[15px] text-blue-50">Ma’lumotlar, rasmlar va hisobotlar. Egasi va kuratorlar uchun.</p>
-      </div>
-      <div className="grid place-items-center px-4 py-10">
-        <div className="w-full max-w-sm">
-          <div className="mb-8 lg:hidden"><Logo /></div>
-          <h1 className="font-serif text-3xl font-semibold text-white">Kirish</h1>
-          <p className="mt-1.5 text-[15px] text-slate-300">Egasi yoki kurator hisobingiz bilan kiring.</p>
-          <form onSubmit={submit} className="mt-6 space-y-4">
-            <Field label="Login"><Input value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} autoFocus autoCapitalize="none" required /></Field>
-            <Field label="Parol"><Input type="password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} required /></Field>
-            <Alert>{error}</Alert>
-            <Button type="submit" className="w-full !min-h-12">Kirish</Button>
-          </form>
-          <p className="mt-6 text-[13px] text-slate-400">Parolni unutgan bo‘lsangiz, tizim egasiga murojaat qiling.</p>
+    <div className="min-h-screen">
+      <header className="border-b border-[var(--rule)]">
+        <div className="mx-auto flex h-12 max-w-[1208px] items-center justify-between px-4 sm:px-6 lg:px-10">
+          <Logo />
+          <a href="/" className="text-sm text-slate-300 transition hover:text-white">Talaba formasi</a>
         </div>
-      </div>
+      </header>
+      <main className="mx-auto grid min-h-[calc(100vh-3rem)] max-w-[1208px] items-center gap-16 px-4 pb-16 sm:px-6 lg:grid-cols-2 lg:px-10">
+        <section className="hidden max-w-md lg:block" aria-label="Tizim haqida">
+          <h2 className="text-base font-semibold text-white">Tyutorlar va kuratorlar uchun</h2>
+          <dl className="mt-4">
+            {[
+              ['Talabalar formasi', 'Guruh bo‘yicha ro‘yxatdan ism tanlanadi, manzil va lokatsiya yig‘iladi, ma’lumot Excel jadvaliga tushadi.'],
+              ['Xonadon rasmlari', 'Tyutor har talaba uchun 4 ta rasm yuklaydi va kerakli qismini kesadi.'],
+              ['Nazorat va hisobot', 'Kim formani to‘ldirmagani ko‘rinadi, rasmlardan tayyor Word hisobot yig‘iladi.'],
+            ].map(([k, v]) => (
+              <div key={k} className="border-b border-[var(--rule)] py-4"><dt className="text-sm font-medium text-white">{k}</dt><dd className="mt-1 text-sm leading-relaxed text-slate-300">{v}</dd></div>
+            ))}
+          </dl>
+        </section>
+        <div className="mx-auto w-full max-w-sm">
+        <h1 className="text-2xl font-semibold text-white">Kirish</h1>
+        <p className="mt-1 text-[15px] text-slate-300">Talabalarning ijara ma’lumotlari: egasi yoki kurator hisobi bilan kiring.</p>
+        <form onSubmit={submit} className="mt-8 space-y-4">
+          <Field label="Login"><Input value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} autoFocus autoCapitalize="none" autoComplete="username" required /></Field>
+          <Field label="Parol"><Input type="password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} autoComplete="current-password" required /></Field>
+          <Alert>{error}</Alert>
+          <Button type="submit" disabled={busy} className="w-full !min-h-11">{busy ? 'Tekshirilmoqda…' : 'Kirish'}</Button>
+        </form>
+        <p className="mt-6 text-[13px] leading-relaxed text-slate-400">Parolni unutgan bo‘lsangiz, tizim egasiga murojaat qiling. Bir nechta noto‘g‘ri urinishdan keyin kirish vaqtincha to‘xtatiladi.</p>
+        </div>
+      </main>
     </div>
   );
 }

@@ -5,3 +5,4 @@ client/dist
 *.log
 .brud
 .claude/
+.taste-skill/

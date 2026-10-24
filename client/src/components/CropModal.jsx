@@ -157,7 +157,7 @@ export default function CropModal({ source, initial = null, title = 'Rasmni kesi
         <input
           type="range" min="1" max={MAX_ZOOM} step="0.01" value={view.z}
           onChange={(e) => bmp && apply(normalize({ ...viewRef.current, z: Number(e.target.value) }, bmp))}
-          aria-label="Kattalashtirish" className="h-2 w-full cursor-pointer accent-blue-500"
+          aria-label="Kattalashtirish" className="h-2 w-full cursor-pointer accent-white"
         />
         <button type="button" onClick={() => bmp && zoomBy(1.25)} className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-ink-600 text-xl text-slate-100 hover:bg-ink-700" aria-label="Kattalashtirish">+</button>
       </div>

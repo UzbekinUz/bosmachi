@@ -1,106 +1,120 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Navigate, Outlet, Link, useLocation } from 'react-router-dom';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence } from 'motion/react';
 import { api, getToken, setToken } from '../api.js';
-import { Logo } from '../components/ui.jsx';
+import { Avatar, Logo } from '../components/ui.jsx';
 import PasswordModal from './PasswordModal.jsx';
 import ProfileModal from './ProfileModal.jsx';
 
-// [yo'l, nomi, end, faqat egasi uchun]
+// [yo'l, nomi, end, faqat egasi uchun, shu bo'limga tegishli boshqa yo'llar]
 const links = [
   ['/admin', 'Ma’lumotlar', true],
-  ['/admin/monitor', 'Nazorat'],
   ['/admin/photos', 'Rasmlar'],
+  ['/admin/monitor', 'Nazorat'],
   ['/admin/groups', 'Guruhlar'],
-  ['/admin/overview', 'Boshqaruv', false, true],
-  ['/admin/users', 'Kuratorlar', false, true],
-  ['/admin/fields', 'Forma maydonlari', false, true],
-  ['/admin/options', 'Variantlar', false, true],
+  ['/admin/overview', 'Boshqaruv', false, true, ['/admin/users']],
+  ['/admin/fields', 'Sozlamalar', false, true, ['/admin/options']],
 ];
+const OWNER_PATHS = ['/admin/overview', '/admin/users', '/admin/fields', '/admin/options'];
 
 const logout = () => { setToken(null); location.href = '/admin/login'; };
+const isActive = (l, path) => (l[2] ? path === l[0] : [l[0], ...(l[4] || [])].some((p) => path === p || path.startsWith(`${p}/`)));
 
 export default function AdminLayout() {
   const { pathname } = useLocation();
   const [me, setMe] = useState(null);
   const [pwOpen, setPwOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [menu, setMenu] = useState(false); // hisob menyusi (kompyuter)
+  const [sheet, setSheet] = useState(false); // to'liq ekranli menyu (telefon)
+  const menuRef = useRef(null);
   const loggedIn = !!getToken();
 
   useEffect(() => { if (loggedIn) api('/admin/me').then(setMe).catch(() => {}); }, [loggedIn]);
+  useEffect(() => { setSheet(false); setMenu(false); }, [pathname]);
+  useEffect(() => {
+    const close = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setMenu(false); };
+    const esc = (e) => { if (e.key === 'Escape') { setMenu(false); setSheet(false); } };
+    document.addEventListener('mousedown', close);
+    document.addEventListener('keydown', esc);
+    return () => { document.removeEventListener('mousedown', close); document.removeEventListener('keydown', esc); };
+  }, []);
 
   if (!loggedIn) return <Navigate to="/admin/login" />;
   if (!me) return <p className="py-20 text-center text-slate-400">Yuklanmoqda…</p>;
 
   const owner = me.role === 'owner';
-  const ownerPaths = links.filter((l) => l[3]).map((l) => l[0]);
-  if (!owner && ownerPaths.includes(pathname)) return <Navigate to="/admin" />;
+  if (!owner && OWNER_PATHS.includes(pathname)) return <Navigate to="/admin" />;
   const visible = links.filter((l) => owner || !l[3]);
+  const name = me.fullName || me.username;
+  const openProfile = () => { setMenu(false); setSheet(false); setProfileOpen(true); };
+  const openPassword = () => { setMenu(false); setSheet(false); setPwOpen(true); };
+
+  const menuItem = 'block w-full rounded-[10px] px-3 py-2.5 text-left text-sm text-slate-200 transition hover:bg-ink-700 hover:text-white';
 
   return (
-    <div className="min-h-screen lg:grid lg:grid-cols-[16rem_1fr]">
-      {/* Kompyuter: chap menyu */}
-      <aside className="sticky top-0 hidden h-screen flex-col bg-ink-900 px-4 py-6 lg:flex">
-        <div className="px-2"><Logo /></div>
-        <nav className="mt-8 flex flex-col gap-1">
-          {visible.map(([to, label, end]) => (
-            <NavLink key={to} to={to} end={end} className="relative rounded-lg px-3 py-2.5 text-[15px] font-medium">
-              {({ isActive }) => (
-                <>
-                  {isActive && <motion.span layoutId="nav-side" className="absolute inset-0 rounded-lg bg-ink-700" transition={{ type: 'spring', stiffness: 400, damping: 34 }} />}
-                  <span className={`relative flex items-center gap-3 ${isActive ? 'text-white' : 'text-slate-300 hover:text-white'}`}>
-                    <span className={`h-5 w-1 rounded-full ${isActive ? 'bg-brand-500' : 'bg-transparent'}`} />{label}
-                  </span>
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-        <div className="mt-auto space-y-1 px-2 text-sm">
-          <div className="mb-3">
-            <div className="truncate font-medium text-white">{me.fullName || me.username}</div>
-            <div className="text-slate-400">@{me.username} · {owner ? 'Egasi' : 'Kurator'}</div>
-          </div>
-          <Link to="/" className="block rounded-lg py-1.5 text-slate-300 transition hover:text-white">Forma ↗</Link>
-          <button onClick={() => setProfileOpen(true)} className="block rounded-lg py-1.5 text-slate-300 transition hover:text-white">Profil va telefon</button>
-          <button onClick={() => setPwOpen(true)} className="block rounded-lg py-1.5 text-slate-300 transition hover:text-white">Parolni almashtirish</button>
-          <button onClick={logout} className="block rounded-lg py-1.5 text-slate-300 transition hover:text-red-300">Chiqish</button>
-        </div>
-      </aside>
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-30 border-b border-[var(--rule)] bg-ink-950">
+        <div className="mx-auto flex h-12 max-w-[1208px] items-center gap-8 px-4 sm:px-6 lg:px-10">
+          <Link to="/admin" aria-label="Bosmachi"><Logo /></Link>
 
-      <div className="min-w-0">
-        {/* Telefon: yuqori panel */}
-        <header className="bg-ink-900 px-4 pb-2 pt-4 lg:hidden">
-          <div className="flex items-center justify-between gap-2">
-            <Logo size="text-xl" />
-            <div className="flex items-center gap-1 text-sm">
-              <Link to="/" className="whitespace-nowrap rounded-lg px-2 py-2 text-slate-300">Forma ↗</Link>
-              <button onClick={() => setProfileOpen(true)} className="rounded-lg px-2.5 py-2 text-slate-300">Profil</button>
-              <button onClick={logout} className="rounded-lg px-2.5 py-2 text-slate-300">Chiqish</button>
-            </div>
-          </div>
-          <nav className="-mx-4 mt-3 flex gap-1 overflow-x-auto px-4 pb-2 [scrollbar-width:none]">
-            {visible.map(([to, label, end]) => (
-              <NavLink key={to} to={to} end={end} className="relative whitespace-nowrap rounded-lg px-4 py-2.5 text-sm font-medium">
-                {({ isActive }) => (
-                  <>
-                    {isActive && <motion.span layoutId="nav-top" className="absolute inset-0 rounded-lg bg-ink-700" transition={{ type: 'spring', stiffness: 400, damping: 34 }} />}
-                    <span className={`relative ${isActive ? 'text-white' : 'text-slate-300'}`}>{label}</span>
-                  </>
-                )}
-              </NavLink>
+          <nav className="hidden items-center gap-6 lg:flex" aria-label="Asosiy">
+            {visible.map((l) => (
+              <NavLink key={l[0]} to={l[0]} end className={`text-sm font-semibold transition ${isActive(l, pathname) ? 'text-white' : 'text-slate-300 hover:text-white'}`}>{l[1]}</NavLink>
             ))}
           </nav>
-        </header>
 
-        <main className="mx-auto max-w-5xl px-4 pb-20 pt-7 lg:px-10 lg:pt-10">
-          <AnimatePresence mode="wait">
-            <motion.div key={pathname} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-              <Outlet context={{ me }} />
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </div>
+          {/* Kompyuter: hisob menyusi */}
+          <div className="relative ml-auto hidden lg:block" ref={menuRef}>
+            <button onClick={() => setMenu(!menu)} aria-expanded={menu} className="flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 text-sm text-slate-200 transition hover:bg-ink-800 hover:text-white">
+              <Avatar name={name} size={28} />
+              <span className="max-w-40 truncate">{name}</span>
+              <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 8 5 5 5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+            </button>
+            {menu && (
+              <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-[14px] bg-ink-700 p-2 shadow-2xl">
+                <div className="px-3 py-2"><div className="truncate text-sm font-medium text-white">{name}</div><div className="text-xs text-slate-300">@{me.username} · {owner ? 'Egasi' : 'Kurator'}</div></div>
+                <button className={menuItem} onClick={openProfile}>Profil va telefon</button>
+                <button className={menuItem} onClick={openPassword}>Parolni almashtirish</button>
+                <Link className={menuItem} to="/">Talaba formasi</Link>
+                <button className={`${menuItem} hover:!text-negative`} onClick={logout}>Chiqish</button>
+              </div>
+            )}
+          </div>
+
+          {/* Telefon: menyu tugmasi */}
+          <button onClick={() => setSheet(true)} className="-mr-2 ml-auto grid h-11 w-11 place-items-center rounded-full text-white lg:hidden" aria-label="Menyu">
+            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M3 6h14M3 10h14M3 14h14" /></svg>
+          </button>
+        </div>
+      </header>
+
+      {sheet && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-ink-950 lg:hidden" role="dialog" aria-modal="true" aria-label="Menyu">
+          <div className="mx-auto flex h-12 max-w-[1208px] items-center justify-between px-4 sm:px-6">
+            <Logo />
+            <button onClick={() => setSheet(false)} className="-mr-2 grid h-11 w-11 place-items-center rounded-full text-white" aria-label="Yopish">
+              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M5 5l10 10M15 5L5 15" /></svg>
+            </button>
+          </div>
+          <nav className="mx-auto max-w-[1208px] px-4 pt-4 sm:px-6" aria-label="Asosiy">
+            {visible.map((l) => (
+              <NavLink key={l[0]} to={l[0]} end className={`flex min-h-12 items-center border-b border-[var(--rule)] text-lg font-medium ${isActive(l, pathname) ? 'text-white' : 'text-slate-300'}`}>{l[1]}</NavLink>
+            ))}
+          </nav>
+          <div className="mx-auto max-w-[1208px] px-4 pb-10 pt-6 sm:px-6">
+            <div className="mb-3 flex items-center gap-3"><Avatar name={name} /><div><div className="text-sm font-medium text-white">{name}</div><div className="text-xs text-slate-300">@{me.username} · {owner ? 'Egasi' : 'Kurator'}</div></div></div>
+            <button className={menuItem} onClick={openProfile}>Profil va telefon</button>
+            <button className={menuItem} onClick={openPassword}>Parolni almashtirish</button>
+            <Link className={menuItem} to="/">Talaba formasi</Link>
+            <button className={`${menuItem} hover:!text-negative`} onClick={logout}>Chiqish</button>
+          </div>
+        </div>
+      )}
+
+      <main className="mx-auto max-w-[1208px] px-4 pb-20 pt-8 sm:px-6 lg:px-10 lg:pt-10">
+        <Outlet context={{ me }} />
+      </main>
 
       <AnimatePresence>
         {me.mustChangePassword && <PasswordModal forced onDone={() => setMe({ ...me, mustChangePassword: false })} />}
