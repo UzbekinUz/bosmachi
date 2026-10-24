@@ -6,11 +6,13 @@ import mongoose from 'mongoose';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { Group, Student, Option, FieldConfig, Submission } from './models.js';
+import { Group, Student, Option, FieldConfig, Submission, Photo } from './models.js';
 import { seed } from './seed.js';
 import { syncExcel, buildWorkbook } from './excel.js';
 import { formatName, isFullName } from './format.js';
 import { buildReport } from './monitor.js';
+import { photosRouter } from './photos.js';
+import { removeStudentPhotos } from './storage.js';
 
 const isProd = process.env.NODE_ENV === 'production';
 if (isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.includes('change-this') || !process.env.ADMIN_PASS || process.env.ADMIN_PASS === 'admin123')) {
@@ -173,7 +175,10 @@ admin.put('/groups/:id', wrap(async (req, res) => {
   res.json(g);
 }));
 admin.delete('/groups/:id', wrap(async (req, res) => {
+  const ids = (await Student.find({ group: req.params.id }).select('_id').lean()).map((s) => s._id);
   await Promise.all([
+    Photo.deleteMany({ group: req.params.id }),
+    removeStudentPhotos(ids),
     Group.findByIdAndDelete(req.params.id),
     Student.deleteMany({ group: req.params.id }),
     Submission.deleteMany({ group: req.params.id }),
@@ -199,7 +204,12 @@ admin.put('/students/:id', wrap(async (req, res) => {
   res.json(s);
 }));
 admin.delete('/students/:id', wrap(async (req, res) => {
-  await Promise.all([Student.findByIdAndDelete(req.params.id), Submission.deleteOne({ student: req.params.id })]);
+  await Promise.all([
+    Student.findByIdAndDelete(req.params.id),
+    Submission.deleteOne({ student: req.params.id }),
+    Photo.deleteMany({ student: req.params.id }),
+    removeStudentPhotos([req.params.id]),
+  ]);
   syncExcel();
   res.json({ ok: true });
 }));
@@ -258,6 +268,8 @@ admin.get('/export', wrap(async (req, res) => {
 
 admin.get('/monitor', wrap(async (req, res) => res.json(await buildReport())));
 
+admin.use(photosRouter);
+
 app.use('/api/admin', admin);
 
 /* ---------------- Production: React build ---------------- */
@@ -269,6 +281,8 @@ if (fs.existsSync(dist)) {
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error(err);
+  if (err.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ message: 'Rasm hajmi 8 MB dan oshmasligi kerak' });
+  if (err.name === 'MulterError') return res.status(400).json({ message: 'Rasm yuklashda xatolik' });
   if (err.status) return res.status(err.status).json({ message: err.message });
   if (err.code === 11000) return res.status(409).json({ message: 'Bunday yozuv allaqachon mavjud' });
   if (err.name === 'ValidationError') return res.status(400).json({ message: 'Maydonlar to‘liq emas' });

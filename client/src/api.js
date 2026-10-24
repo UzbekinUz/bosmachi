@@ -23,6 +23,21 @@ export async function api(path, { method = 'GET', body, raw } = {}) {
   return data;
 }
 
+// Fayl yuklash (multipart): Content-Type brauzer o'zi qo'yadi
+export async function upload(path, formData, method = 'PUT') {
+  const res = await fetch(`/api${path}`, {
+    method,
+    headers: getToken() ? { Authorization: `Bearer ${getToken()}` } : {},
+    body: formData,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401) { setToken(null); location.href = '/admin/login'; }
+    throw new Error(data.message || 'Yuklashda xatolik yuz berdi');
+  }
+  return data;
+}
+
 export function formatPhone(value) {
   let d = String(value || '').replace(/\D/g, '');
   if (d.startsWith('998')) d = d.slice(3);

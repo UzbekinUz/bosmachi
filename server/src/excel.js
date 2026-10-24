@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { Submission, Group } from './models.js';
 
 const dir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data');
-export const EXCEL_PATH = path.join(dir, 'submissions.xlsx');
+export const EXCEL_PATH = process.env.EXCEL_PATH || path.join(dir, 'submissions.xlsx');
 
 const TITLE = 'Toshkent davlat iqtisodiyot universiteti talabalarining ijara xonadonlariga joylashishi yuzasidan';
 const HEADERS = [

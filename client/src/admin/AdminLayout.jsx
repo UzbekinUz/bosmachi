@@ -6,6 +6,7 @@ import { Logo } from '../components/ui.jsx';
 const links = [
   ['/admin', 'Ma’lumotlar', true],
   ['/admin/monitor', 'Nazorat'],
+  ['/admin/photos', 'Rasmlar'],
   ['/admin/groups', 'Guruhlar'],
   ['/admin/fields', 'Forma maydonlari'],
   ['/admin/options', 'Variantlar'],

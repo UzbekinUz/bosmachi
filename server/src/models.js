@@ -57,4 +57,14 @@ const Submission = model('Submission', new Schema({
   location: String,
 }, { timestamps: true }));
 
-export { Group, Student, Option, FieldConfig, Submission };
+// Tyutor yuklagan rasmlar: har talabaga 4 ta joy (slot 1-4). Fayllar diskda, bu yerda faqat yo'li.
+const Photo = model('Photo', new Schema({
+  student: { type: Schema.Types.ObjectId, ref: 'Student', required: true, index: true },
+  group: { type: Schema.Types.ObjectId, ref: 'Group', required: true, index: true },
+  slot: { type: Number, required: true, min: 1, max: 4 },
+  file: { type: String, required: true }, // "<talabaId>/<slot>" — kengaytma va o'lcham nomi storage.js'da
+  size: { type: Number, default: 0 },
+}, { timestamps: true }));
+Photo.schema.index({ student: 1, slot: 1 }, { unique: true });
+
+export { Group, Student, Option, FieldConfig, Submission, Photo };
