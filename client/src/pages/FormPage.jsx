@@ -9,13 +9,13 @@ const REGION = 'Toshkent shahar';
 const emptyForm = { phone: '', landlordName: '', landlordPhone: '', region: REGION, district: '', mahalla: '', street: '', house: '', apartment: '', location: '' };
 const emptyPerson = { info: '', fullName: '', phone: '' };
 
-const Section = ({ n, title, children }) => (
+const Section = ({ title, hint, children }) => (
   <Item as="section">
     <Card className="space-y-4">
-      <h2 className="flex items-center gap-3 text-[15px] font-semibold text-white">
-        <span className="grid h-7 w-7 place-items-center rounded-md bg-brand-600/20 text-sm text-brand-400">{n}</span>
-        {title}
-      </h2>
+      <div>
+        <h2 className="text-lg font-semibold text-white">{title}</h2>
+        {hint && <p className="mt-1 text-[14px] leading-snug text-slate-300">{hint}</p>}
+      </div>
       {children}
     </Card>
   </Item>
@@ -97,6 +97,13 @@ export default function FormPage() {
         <Link to="/admin" className="rounded-lg px-2 py-1.5 text-sm text-slate-500 transition hover:text-brand-400">Admin</Link>
       </motion.header>
 
+      {!done && (
+        <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="mb-5">
+          <h1 className="text-2xl font-semibold text-white">Ijara ma’lumotlari</h1>
+          <p className="mt-1.5 text-[15px] leading-relaxed text-slate-300">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>
+        </motion.div>
+      )}
+
       {!cfg && !error && <p className="py-10 text-center text-slate-400">Yuklanmoqda…</p>}
 
       <AnimatePresence mode="wait">
@@ -118,7 +125,7 @@ export default function FormPage() {
           </motion.div>
         ) : cfg && (
           <Stagger as="form" key="form" onSubmit={submit} className="space-y-4">
-            <Section n="1" title="Talaba">
+            <Section title="Talaba" hint="Guruhingizni, so‘ng ro‘yxatdan ismingizni tanlang. Ismingiz topilmasa, guruh tyutoringizga murojaat qiling.">
               <Field label="Guruh" required>
                 <Picker
                   title="Guruhni tanlang" placeholder="Guruhni tanlang…" required
@@ -150,7 +157,7 @@ export default function FormPage() {
               </Collapse>
             </Section>
 
-            <Section n="2" title="Aloqa ma’lumotlari">
+            <Section title="Aloqa ma’lumotlari" hint="Telefon raqamlari +998 bilan avtomatik yoziladi. Uy egasining ismini familiya, ism va otasining ismi bilan to‘liq yozing.">
               {fieldMap.phone && (
                 <Field label={lbl('phone')} required={req('phone')}>
                   <Input type="tel" inputMode="tel" autoComplete="tel" placeholder="+998 90 123 45 67" value={form.phone} onChange={setPhone('phone')} required={req('phone')} />
@@ -169,7 +176,7 @@ export default function FormPage() {
             </Section>
 
             {fieldMap.cohabitants && (
-              <Section n="3" title={`${lbl('cohabitants')}${req('cohabitants') ? ' *' : ''}`}>
+              <Section title={`${lbl('cohabitants')}${req('cohabitants') ? ' *' : ''}`} hint="Siz bilan bir xonadonda yashaydigan boshqa odamlar. Har biri uchun kim ekanini (masalan: TDPI talabasi), to‘liq ismi va telefonini yozing.">
                 <p className="-mt-1 text-xs text-slate-400">Yolg‘iz yashasangiz, bo‘sh qoldiring.</p>
                 <AnimatePresence initial={false}>
                   {people.map((p, i) => (
@@ -196,7 +203,7 @@ export default function FormPage() {
             )}
 
             {hasAddress && (
-              <Section n={fieldMap.cohabitants ? '4' : '3'} title="Ijara manzili">
+              <Section title="Ijara manzili" hint="Hozir ijarada turgan xonadon manzili. Lokatsiyani xaritadan belgilasangiz, tyutor uni oson topadi.">
                 {fieldMap.region && (
                   <Field label={lbl('region')}>
                     <Input value={REGION} readOnly tabIndex={-1} className="cursor-not-allowed opacity-70" />
@@ -238,7 +245,7 @@ export default function FormPage() {
 
             <Alert>{error}</Alert>
 
-            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-700 bg-ink-950/85 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur">
+            <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-700 bg-ink-950 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
               <div className="mx-auto max-w-xl">
                 <Button type="submit" disabled={busy || !studentId} className="w-full !min-h-12 text-base">{busy ? 'Yuborilmoqda…' : 'Yuborish'}</Button>
               </div>

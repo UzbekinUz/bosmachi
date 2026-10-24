@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Input, Select } from '../components/ui.jsx';
+import { Alert, Button, Card, Input, PageHead, Select } from '../components/ui.jsx';
 
 function Section({ title, hint, type, items, regions, reload, withParent }) {
   const [value, setValue] = useState('');
@@ -51,11 +51,23 @@ export default function Options() {
   const regions = ['Toshkent shahar'];
 
   return (
+    <div className="space-y-5">
+      <PageHead
+        title="Variantlar"
+        steps={[
+          '"Ijara holati": Ma’lumotlar bo‘limida talabaga belgilanadigan variantlar. Word hisobotdagi jadval faqat Yashil, Sariq va Qizilni sanaydi.',
+          '"Tumanlar": formada talaba tanlaydigan Toshkent tumanlari. Qo‘shish, nomini tuzatish yoki o‘chirish mumkin.',
+          'Nomini o‘zgartirsangiz, eski yozuvlardagi qiymat o‘zgarmaydi, faqat yangi tanlovlarga ta’sir qiladi.',
+        ]}
+      >
+        Formadagi tanlov ro‘yxatlari: ijara holati va tumanlar.
+      </PageHead>
     <div className="grid gap-4 lg:grid-cols-2">
       <Section title="Ijara holati variantlari" hint="Admin talabaga shu variantlardan birini belgilaydi." type="rentStatus" items={of('rentStatus')} reload={load} />
       <div className="lg:col-span-2">
         <Section title="Toshkent shahri tumanlari" hint="Formadagi tuman ro‘yxati." type="district" items={of('district')} regions={regions} reload={load} withParent />
       </div>
+    </div>
     </div>
   );
 }

@@ -16,16 +16,16 @@ export const Item = ({ as = 'div', ...props }) => {
 };
 
 /* ---------- Maydonlar ---------- */
-const base = 'h-12 w-full rounded-lg border border-ink-600/80 bg-ink-900 px-3.5 text-base text-slate-100 placeholder-slate-500 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30 disabled:opacity-50 sm:h-11 sm:text-sm';
+const base = 'h-12 w-full rounded-lg border border-ink-600 bg-ink-900 px-3.5 text-base text-slate-100 placeholder-slate-500 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 disabled:opacity-50 sm:h-11 sm:text-sm';
 
 export function Field({ label, required, hint, children }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-blue-100/90">
+      <span className="mb-1.5 block text-sm font-medium text-slate-200">
         {label}{required && <span className="ml-0.5 text-brand-400">*</span>}
       </span>
       {children}
-      {hint && <span className="mt-1.5 block text-xs text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1.5 block text-[13px] leading-snug text-slate-400">{hint}</span>}
     </label>
   );
 }
@@ -39,8 +39,8 @@ export function Select({ children, ...props }) {
 
 export function Button({ variant = 'primary', className = '', disabled, ...props }) {
   const styles = {
-    primary: 'bg-brand-600 text-white hover:bg-brand-500 shadow-lg shadow-blue-950/50',
-    ghost: 'border border-ink-600 text-blue-100 hover:bg-ink-700/60',
+    primary: 'bg-brand-600 text-white hover:bg-brand-500',
+    ghost: 'border border-ink-600 text-slate-100 hover:bg-ink-700',
     danger: 'border border-red-500/40 text-red-300 hover:bg-red-500/10',
   };
   return (
@@ -54,7 +54,7 @@ export function Button({ variant = 'primary', className = '', disabled, ...props
 }
 
 export const Card = ({ className = '', ...props }) => (
-  <div {...props} className={`rounded-xl border border-ink-700 bg-ink-800/70 p-4 shadow-lg shadow-black/20 sm:p-5 ${className}`} />
+  <div {...props} className={`rounded-xl border border-ink-700 bg-ink-800 p-4 sm:p-5 ${className}`} />
 );
 
 export function Alert({ type = 'error', children }) {
@@ -77,7 +77,7 @@ export function Alert({ type = 'error', children }) {
 export function Logo({ size = 'text-xl' }) {
   return (
     <div className={`flex items-center gap-2.5 font-bold tracking-tight text-white ${size}`}>
-      <span className="grid h-9 w-9 place-items-center rounded-lg bg-gradient-to-br from-brand-400 to-brand-600 text-base shadow-lg shadow-blue-950/60">B</span>
+      <span className="grid h-9 w-9 place-items-center rounded-lg bg-brand-600 text-base text-white">B</span>
       Bosmachi
     </div>
   );
@@ -105,7 +105,7 @@ export function Modal({ title, onClose, children, wide }) {
       className="fixed inset-0 z-[2000] flex items-end justify-center sm:items-center sm:p-4"
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.18 }}
     >
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-[2px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/75" onClick={onClose} />
       <motion.div
         role="dialog" aria-modal="true" aria-label={title}
         initial={{ y: 60, opacity: 0.6 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 60, opacity: 0 }}
@@ -182,5 +182,43 @@ export function Picker({ value, onChange, options, placeholder = 'Tanlang…', t
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+/* ---------- Sahifa sarlavhasi + "Qanday ishlaydi?" yordami ---------- */
+export function PageHead({ title, children, steps = [] }) {
+  return (
+    <header className="mb-6 max-w-3xl">
+      <h1 className="text-2xl font-semibold text-white sm:text-[1.75rem]">{title}</h1>
+      {children && <p className="mt-1.5 text-[15px] leading-relaxed text-slate-300">{children}</p>}
+      {steps.length > 0 && (
+        <details className="group mt-3">
+          <summary className="inline-flex min-h-9 cursor-pointer select-none items-center gap-2 rounded-lg border border-ink-600 px-3 text-sm text-slate-200 transition hover:bg-ink-700">
+            <span className="grid h-5 w-5 place-items-center rounded-full border border-slate-400 text-xs leading-none">i</span>
+            Qanday ishlaydi?
+            <svg className="h-3.5 w-3.5 transition group-open:rotate-180" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2"><path d="m5 8 5 5 5-5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          </summary>
+          <ul className="mt-3 space-y-2 rounded-lg bg-ink-800 p-4 text-[15px] leading-relaxed text-slate-200">
+            {steps.map((t, i) => (
+              <li key={i} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" /><span>{t}</span></li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </header>
+  );
+}
+
+/* Kichik izoh tugmasi: bosilganda matn ochiladi (har bir funksiya yonida) */
+export function Info({ children }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <span className="inline-block align-middle">
+      <button
+        type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label="Izoh"
+        className="ml-1.5 grid h-5 w-5 place-items-center rounded-full border border-slate-500 text-xs leading-none text-slate-300 transition hover:border-brand-400 hover:text-brand-400"
+      >i</button>
+      {open && <span className="mt-1.5 block max-w-md rounded-lg bg-ink-700 px-3 py-2 text-[13px] font-normal leading-snug text-slate-100">{children}</span>}
+    </span>
   );
 }

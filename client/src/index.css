@@ -1,14 +1,15 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+/* Bosmachi: qora-ko'k, tekis ranglar. Gradient, yaltiroq soya va shishasimon fon ishlatilmaydi. */
 @theme {
-  --font-sans: "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
-  --color-ink-950: #060b1c;
-  --color-ink-900: #0a1230;
-  --color-ink-800: #101b43;
-  --color-ink-700: #1a2a5e;
-  --color-ink-600: #27407f;
-  --color-brand-400: #5b9bff;
+  --font-sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, Roboto, sans-serif;
+  --color-ink-950: #070c1d;
+  --color-ink-900: #0b1330;
+  --color-ink-800: #0f1a3d;
+  --color-ink-700: #1a2755;
+  --color-ink-600: #2a3f7d;
+  --color-brand-400: #6ba5ff;
   --color-brand-500: #3b82f6;
   --color-brand-600: #2563eb;
 }
@@ -18,13 +19,15 @@ html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent;
 html, body, #root { min-height: 100%; }
 body {
   margin: 0;
-  color: #dbe6ff;
-  background:
-    radial-gradient(900px 500px at 85% -10%, rgba(59,130,246,.14), transparent 60%),
-    radial-gradient(700px 400px at -10% 110%, rgba(37,99,235,.10), transparent 60%),
-    #060b1c;
-  background-attachment: fixed;
+  color: #e3ebff;
+  background: #070c1d;
+  font-feature-settings: "tnum" 1;
 }
+h1, h2, h3 { letter-spacing: -0.015em; }
 button, a { touch-action: manipulation; }
-select option { background: #0a1230; color: #dbe6ff; }
-.leaflet-container { background: #0a1230; isolation: isolate; }
+select option { background: #0b1330; color: #e3ebff; }
+.leaflet-container { background: #0b1330; isolation: isolate; }
+
+/* Yordam bloki: <details> belgisini yashiramiz, o'zimiz chizamiz */
+details > summary { list-style: none; }
+details > summary::-webkit-details-marker { display: none; }

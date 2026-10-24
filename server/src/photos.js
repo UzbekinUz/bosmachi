@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 import fs from 'node:fs';
 import { Student, Photo, Submission } from './models.js';
 import { saveVariants, removeFiles, photoPath } from './storage.js';
-import { buildReportDoc, reportPreview } from './report.js';
+import { buildReportDoc, reportPreview, addressOf } from './report.js';
 import { assertGroup, resolveScope, inScope } from './users.js';
 
 const wrap = (fn) => (req, res, next) => fn(req, res, next).catch(next);
@@ -37,12 +37,22 @@ photosRouter.get('/photos/summary', wrap(async (req, res) => {
   const q = inScope(resolveScope(req, req.query.group));
   const done = await Submission.find(q).distinct('student');
   const students = await Student.find({ ...q, _id: { $in: done } }).populate('group', 'index').sort({ fullName: 1 }).lean();
-  const photos = await Photo.find({ student: { $in: students.map((s) => s._id) } }).lean();
+  const ids = students.map((s) => s._id);
+  const [photos, subs] = await Promise.all([
+    Photo.find({ student: { $in: ids } }).lean(),
+    Submission.find({ student: { $in: ids } }).lean(),
+  ]);
+  const subBy = Object.fromEntries(subs.map((s) => [String(s.student), s]));
   const byStudent = {};
   for (const p of photos) (byStudent[p.student] ||= []).push({ id: p._id, slot: p.slot, updatedAt: p.updatedAt });
   res.json(students.map((s) => {
     const list = (byStudent[s._id] || []).sort((a, b) => a.slot - b.slot);
-    return { _id: s._id, fullName: s.fullName, groupIndex: s.group?.index || '', count: list.length, photos: list };
+    const sub = subBy[String(s._id)];
+    return {
+      _id: s._id, fullName: s.fullName, groupIndex: s.group?.index || '', count: list.length, photos: list,
+      // Tyutor xonadonga borishi uchun kerakli ma'lumotlar
+      address: addressOf(sub), location: sub?.location || '', phone: sub?.phone || '', landlordName: sub?.landlordName || '',
+    };
   }));
 }));
 

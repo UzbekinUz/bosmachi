@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card } from '../components/ui.jsx';
+import { Alert, Button, Card, PageHead } from '../components/ui.jsx';
 
 const Stat = ({ label, value, tone = 'text-white' }) => (
   <Card className="!p-4"><div className="text-xs uppercase tracking-wide text-slate-400">{label}</div><div className={`mt-1 text-2xl font-bold ${tone}`}>{value}</div></Card>
@@ -21,8 +21,18 @@ export default function Monitor() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">Kim hali to‘ldirmagani va shubhali yozuvlar avtomatik tekshiriladi.</p>
+      <PageHead
+        title="Nazorat"
+        steps={[
+          'Yuqoridagi raqamlar: nechta talaba formani to‘ldirgan, nechtasi to‘ldirmagan va nechta yozuvda shubhali joy bor.',
+          '"Guruhlar bo‘yicha" ro‘yxatida har guruhning to‘ldirish foizi turadi. "Kimlar yo‘q" tugmasi to‘ldirmagan talabalarni va tyutorni ko‘rsatadi: eslatish uchun.',
+          '"Tekshiruv natijalari"da noto‘g‘ri telefon, to‘liq bo‘lmagan ism yoki manzil, lokatsiyasiz yozuvlar chiqadi. Qizil belgi jiddiy, kulrang belgi ma’lumot uchun.',
+          'Sahifa ochilganda yangilanadi. Yangi ma’lumotni ko‘rish uchun "Yangilash"ni bosing.',
+        ]}
+      >
+        Kim hali formani to‘ldirmagani va shubhali yozuvlar avtomatik tekshiriladi.
+      </PageHead>
+      <div className="-mt-4 flex justify-end">
         <Button variant="ghost" onClick={load}>↻ Yangilash</Button>
       </div>
       <Alert>{error}</Alert>

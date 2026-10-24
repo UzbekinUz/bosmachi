@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Field, Input, Modal, Select } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Modal, PageHead, Select } from '../components/ui.jsx';
 
 const editable = [
   ['phone', 'Telefon'], ['landlordName', 'Uy egasi'], ['landlordPhone', 'Uy egasi telefoni'],
@@ -50,12 +50,23 @@ export default function Submissions() {
 
   return (
     <div className="space-y-4">
+      <PageHead
+        title="Ma’lumotlar"
+        steps={[
+          'Talabalar formada kiritgan ma’lumotlar shu yerda ko‘rinadi. Guruh bo‘yicha saralash va ism, telefon yoki tuman bo‘yicha qidirish mumkin.',
+          'Har bir talabaga "Ijara holati" ni (Yashil, Sariq, Qizil) ro‘yxatdan o‘zingiz belgilaysiz, talaba buni ko‘rmaydi.',
+          '"Ko‘rish" tugmasi to‘liq ma’lumotni ochadi: uni tahrirlash yoki xatoni to‘g‘rilash mumkin. "O‘chirish" talabaga formani qayta to‘ldirish imkonini beradi.',
+          '"Excel yuklab olish" har bir guruh uchun alohida listli tayyor jadval beradi.',
+        ]}
+      >
+        Talabalarning ijara va yashash joyi haqida yuborgan ma’lumotlari.
+      </PageHead>
       <div className="flex flex-wrap items-end gap-3">
         <div className="w-44"><Field label="Guruh"><Select value={group} onChange={(e) => setGroup(e.target.value)}><option value="">Barchasi</option>{groups.map((g) => <option key={g._id} value={g._id}>{g.index}</option>)}</Select></Field></div>
         <div className="min-w-48 flex-1"><Field label="Qidirish"><Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ism, telefon, tuman…" /></Field></div>
         <Button onClick={download}>⬇ Excel yuklab olish</Button>
       </div>
-      <p className="text-sm text-slate-400">Jami: <b className="text-white">{shown.length}</b> ta yozuv. Ma’lumotlar <code className="text-brand-400">server/data/submissions.xlsx</code> fayliga avtomatik yoziladi.</p>
+      <p className="text-sm text-slate-300">Jami: <b className="text-white">{shown.length}</b> ta yozuv. Ma’lumotlar <code className="text-brand-400">server/data/submissions.xlsx</code> fayliga avtomatik yoziladi.</p>
       <Alert>{error}</Alert>
 
       {/* Telefon: kartochkalar */}

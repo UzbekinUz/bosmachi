@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Input } from '../components/ui.jsx';
+import { Alert, Button, Card, Input, PageHead } from '../components/ui.jsx';
 
 export default function Fields() {
   const [list, setList] = useState([]);
@@ -24,7 +24,17 @@ export default function Fields() {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-slate-400">Formada qaysi ma’lumotlar yig‘ilishini, ularning nomi, tartibi va majburiyligini shu yerda o‘zgartiring. Guruh va to‘liq ism doim so‘raladi; ijara holatini admin Ma’lumotlar bo‘limida belgilaydi.</p>
+      <PageHead
+        title="Forma maydonlari"
+        steps={[
+          '"Ko‘rsatish" belgisi o‘chirilsa, maydon formada chiqmaydi va talabadan so‘ralmaydi.',
+          '"Majburiy" belgisi bo‘lsa, talaba bu maydonni to‘ldirmasdan yubora olmaydi.',
+          'Maydon nomini o‘zgartirsangiz, u formada va Excel jadvalida yangi nom bilan chiqadi. ▲ ▼ tugmalari tartibni o‘zgartiradi.',
+          'O‘zgarishlar "Saqlash"ni bosgandan keyin kuchga kiradi.',
+        ]}
+      >
+        Formada qaysi ma’lumotlar yig‘ilishini, ularning nomi va majburiyligini belgilang. Guruh va to‘liq ism doim so‘raladi, ijara holatini esa admin o‘zi belgilaydi.
+      </PageHead>
       <Card className="divide-y divide-ink-700/60 !p-0">
         {list.map((f, i) => (
           <div key={f.key} className={`flex flex-wrap items-center gap-3 px-4 py-3 ${f.enabled ? '' : 'opacity-60'}`}>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Field, Input, Modal } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Modal, PageHead } from '../components/ui.jsx';
 
 const blank = { index: '', faculty: '', direction: '', course: '', tutor: '', tutorPhone: '' };
 
@@ -28,8 +28,18 @@ export default function Groups() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-400">Guruh yaratilganda tyutor ham belgilanadi.</p>
+      <PageHead
+        title="Guruhlar"
+        steps={[
+          '"Yangi guruh": indeks (masalan I-87/25i), fakultet, yo‘nalish, kurs va guruh tyutorining ismi hamda telefonini kiriting. Talaba formada guruhni shu indeks bilan tanlaydi.',
+          '"Talabalar" tugmasi guruh ro‘yxatini ochadi. Ismlarni Excel’dan nusxalab, har qatorga bittadan qo‘yish mumkin, ular avtomatik to‘g‘ri yoziladi.',
+          '"To‘ldirgan" ustuni nechta talaba formani to‘ldirganini ko‘rsatadi.',
+          'Guruhni o‘chirsangiz, uning talabalari, yozuvlari va rasmlari ham o‘chadi.',
+        ]}
+      >
+        Talabalar guruhlari, ularning tyutorlari va talabalar ro‘yxati.
+      </PageHead>
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ ...blank })}>+ Yangi guruh</Button>
       </div>
       <Alert>{error}</Alert>

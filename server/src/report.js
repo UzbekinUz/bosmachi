@@ -37,7 +37,7 @@ const norm = (v) => String(v || '').replace(/\s+/g, ' ').trim();
 const lower = (v) => norm(v).toLowerCase();
 
 // "Toshkent shahri," yozilmaydi; boshqa viloyat bo'lsa to'liq qoladi
-function addressOf(s) {
+export function addressOf(s) {
   if (!s) return '';
   return [
     s.region && s.region !== REGION && s.region,

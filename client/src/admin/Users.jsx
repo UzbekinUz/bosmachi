@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../api.js';
-import { Alert, Button, Card, Field, Input, Modal } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Modal, PageHead } from '../components/ui.jsx';
 
 const blank = { username: '', fullName: '', password: '', groups: [], active: true };
 
@@ -50,8 +50,18 @@ export default function Users() {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-slate-400">Kuratorlar faqat o‘zlariga biriktirilgan guruhlarning ma’lumotlari, rasmlari va hisobotini ko‘radi.</p>
+      <PageHead
+        title="Kuratorlar"
+        steps={[
+          '"Yangi kurator": ism, login va vaqtincha parolni kiriting (tasodifiy parol tugmasi bor), so‘ng kurator javob beradigan guruhlarni belgilang.',
+          'Login va parolni kuratorga o‘zingiz yuborasiz. Kurator birinchi kirishda parolni o‘zi almashtiradi.',
+          'Kurator faqat o‘z guruhlarining ma’lumotlari, rasmlari, nazorati, Excel va Word hisobotini ko‘radi. Guruh, forma va kuratorlarni boshqara olmaydi.',
+          '"Faol" belgisini o‘chirsangiz, kurator darhol tizimga kira olmay qoladi, ma’lumotlari saqlanadi.',
+        ]}
+      >
+        Sizning nomingizdan ishlaydigan adminlar. Har biri faqat o‘ziga biriktirilgan guruhlarni ko‘radi.
+      </PageHead>
+      <div className="flex justify-end">
         <Button onClick={() => { setError(''); setForm({ ...blank, password: randomPassword() }); }}>+ Yangi kurator</Button>
       </div>
       <Alert>{form ? '' : error}</Alert>
@@ -60,7 +70,7 @@ export default function Users() {
         {users.map((u) => (
           <div key={u._id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 ${u.active ? '' : 'opacity-50'}`}>
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-white">{u.fullName || u.username} {u.role === 'owner' && <span className="ml-1 rounded bg-brand-600/20 px-1.5 py-0.5 text-xs text-brand-400">Egasi</span>}{!u.active && <span className="ml-1 text-xs text-red-300">faol emas</span>}</div>
+              <div className="font-medium text-white">{u.fullName || u.username} {u.role === 'owner' && <span className="ml-1 rounded bg-ink-700 px-1.5 py-0.5 text-xs text-brand-400">Egasi</span>}{!u.active && <span className="ml-1 text-xs text-red-300">faol emas</span>}</div>
               <div className="text-sm text-slate-400">@{u.username}</div>
               {u.role === 'curator' && (
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
