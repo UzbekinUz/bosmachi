@@ -139,7 +139,7 @@ export default function CropModal({ source, initial = null, title = 'Rasmni kesi
   return (
     <Modal title={title} onClose={onCancel}>
       <p className="mb-3 text-[15px] leading-relaxed text-slate-300">
-        Rasmni <b className="text-white">sudrab</b> kerakli joyini tanlang. <b className="text-white">Ikki barmoq</b> (yoki sichqoncha g‘ildiragi, slayder) bilan kattalashtiring. Asl rasm saqlanadi, istalgan payt qayta kesish mumkin.
+        Rasmni <b className="text-fg">sudrab</b> kerakli joyini tanlang. <b className="text-fg">Ikki barmoq</b> (yoki sichqoncha g‘ildiragi, slayder) bilan kattalashtiring. Asl rasm saqlanadi, istalgan payt qayta kesish mumkin.
       </p>
       <div ref={wrap} className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-ink-900">
         <canvas
@@ -157,7 +157,7 @@ export default function CropModal({ source, initial = null, title = 'Rasmni kesi
         <input
           type="range" min="1" max={MAX_ZOOM} step="0.01" value={view.z}
           onChange={(e) => bmp && apply(normalize({ ...viewRef.current, z: Number(e.target.value) }, bmp))}
-          aria-label="Kattalashtirish" className="h-2 w-full cursor-pointer accent-white"
+          aria-label="Kattalashtirish" className="h-2 w-full cursor-pointer accent-fg"
         />
         <button type="button" onClick={() => bmp && zoomBy(1.25)} className="grid h-11 w-11 shrink-0 place-items-center rounded-lg border border-ink-600 text-xl text-slate-100 hover:bg-ink-700" aria-label="Kattalashtirish">+</button>
       </div>

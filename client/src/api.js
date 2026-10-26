@@ -17,7 +17,7 @@ export async function api(path, { method = 'GET', body, raw } = {}) {
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
-    if (res.status === 401 && path.startsWith('/admin')) { setToken(null); location.href = '/admin/login'; }
+    if (res.status === 401 && path.startsWith('/admin')) { setToken(null); location.href = `/admin/login?next=${encodeURIComponent(location.pathname)}`; }
     throw new Error(data.message || 'Xatolik yuz berdi');
   }
   return data;

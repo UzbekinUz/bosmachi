@@ -1,0 +1,25 @@
+{
+  "id": "/admin",
+  "name": "Hygge — ijara ma'lumotlari",
+  "short_name": "Hygge",
+  "description": "Talabalarning ijara xonadonlari: ma'lumotlar, rasmlar, nazorat va hisobot. Kuratorlar va egasi uchun.",
+  "lang": "uz",
+  "dir": "ltr",
+  "start_url": "/admin?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#0c0d0f",
+  "theme_color": "#0c0d0f",
+  "categories": ["education", "productivity"],
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ma'lumotlar", "url": "/admin?source=shortcut", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Rasmlar", "url": "/admin/photos?source=shortcut", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Nazorat", "url": "/admin/monitor?source=shortcut", "icons": [{ "src": "/icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

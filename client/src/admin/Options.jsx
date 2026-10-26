@@ -31,7 +31,7 @@ function Section({ title, hint, type, items, reload }) {
   return (
     <section className="grid gap-4 border-b border-[var(--rule)] py-8 first:pt-2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-12">
       <div>
-        <h2 className="text-base font-semibold text-white">{title}</h2>
+        <h2 className="text-base font-semibold text-fg">{title}</h2>
         <p className="mt-1 max-w-sm text-sm leading-relaxed text-slate-300">{hint}</p>
         <p className="mt-3 text-sm text-slate-400">Hozir: {items.length} ta variant</p>
       </div>
@@ -44,9 +44,9 @@ function Section({ title, hint, type, items, reload }) {
         <ul className="mt-3 max-h-80 overflow-y-auto">
           {items.map((o) => (
             <li key={o._id} className="flex min-h-12 items-center justify-between gap-3 border-b border-[var(--rule)] text-sm last:border-0">
-              <span className="text-white">{o.value}</span>
+              <span className="text-fg">{o.value}</span>
               <span className="flex shrink-0 gap-4">
-                <button onClick={() => rename(o)} className="min-h-9 text-slate-200 underline-offset-4 hover:text-white hover:underline">Tahrirlash</button>
+                <button onClick={() => rename(o)} className="min-h-9 text-slate-200 underline-offset-4 hover:text-fg hover:underline">Tahrirlash</button>
                 <button onClick={() => remove(o)} className="min-h-9 text-negative underline-offset-4 hover:underline">O‘chirish</button>
               </span>
             </li>

@@ -70,12 +70,12 @@ function StudentInfo({ student }) {
       <div className="flex items-center gap-3">
         <Avatar name={student.fullName} size={44} />
         <div className="min-w-0">
-          <div className="truncate text-lg font-semibold text-white">{student.fullName}</div>
+          <div className="truncate text-lg font-semibold text-fg">{student.fullName}</div>
           <div className="text-sm text-slate-300">{student.groupIndex}{student.phone ? ` · ${student.phone}` : ''}</div>
         </div>
       </div>
       <dl className="mt-4 grid gap-3 text-[15px]">
-        <div><dt className="text-[13px] text-slate-300">Manzil</dt><dd className="text-white">{student.address || 'Kiritilmagan'}</dd></div>
+        <div><dt className="text-[13px] text-slate-300">Manzil</dt><dd className="text-fg">{student.address || 'Kiritilmagan'}</dd></div>
         <div>
           <dt className="text-[13px] text-slate-300">Lokatsiya</dt>
           <dd className="mt-1.5 flex flex-wrap items-center gap-2">
@@ -169,7 +169,7 @@ function StudentModal({ student, onClose, onChanged }) {
     <Modal title="Xonadon rasmlari" onClose={onClose} wide>
       <StudentInfo student={student} />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <span className="flex items-center gap-3 text-sm text-slate-200"><span className="tabular-nums text-white">{student.count} / {TOTAL}</span><Pill tone={st.tone}>{st.text}</Pill></span>
+        <span className="flex items-center gap-3 text-sm text-slate-200"><span className="tabular-nums text-fg">{student.count} / {TOTAL}</span><Pill tone={st.tone}>{st.text}</Pill></span>
         <Button variant="ghost" disabled={!free} onClick={() => multi.current?.click()} title="Bir vaqtda bir nechta rasm tanlash: bo‘sh joylarga ketma-ket joylanadi">Bir nechta rasm tanlash</Button>
         <input ref={multi} type="file" multiple accept="image/jpeg,image/png,image/webp" hidden onChange={(e) => { const f = [...e.target.files]; e.target.value = ''; if (f.length) pickMany(f); }} />
       </div>
@@ -183,7 +183,7 @@ function StudentModal({ student, onClose, onChanged }) {
         ))}
       </div>
       <p className="mt-4 text-[13px] leading-relaxed text-slate-300">
-        Eshik, oshxona kabi xonadon ichidan olingan 4 ta rasmni yuklang. Yuklashda rasmning qaysi qismi qolishini o‘zingiz tanlaysiz; keyin ham <b className="font-medium text-white">Kesish</b> tugmasi bilan o‘zgartirish mumkin: asl rasm saqlanadi, qirqib tashlangan qismlar ham qaytadi.
+        Eshik, oshxona kabi xonadon ichidan olingan 4 ta rasmni yuklang. Yuklashda rasmning qaysi qismi qolishini o‘zingiz tanlaysiz; keyin ham <b className="font-medium text-fg">Kesish</b> tugmasi bilan o‘zgartirish mumkin: asl rasm saqlanadi, qirqib tashlangan qismlar ham qaytadi.
       </p>
 
       {big && <BigImage photo={big} title={student.fullName} onClose={() => setBig(null)} />}
@@ -234,7 +234,7 @@ function ReportPanel({ group, groupLabel, version }) {
     <Card className="mt-10">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-white">Word hisobot <Info>Titul sahifa, har talaba uchun bitta sahifa (2×2 rasm va manzil) va oxirida Yashil/Sariq/Qizil jadvali bilan .docx fayl yig‘iladi. Guruh tanlangan bo‘lsa, faqat shu guruh uchun.</Info></h2>
+          <h2 className="text-base font-semibold text-fg">Word hisobot <Info>Titul sahifa, har talaba uchun bitta sahifa (2×2 rasm va manzil) va oxirida Yashil/Sariq/Qizil jadvali bilan .docx fayl yig‘iladi. Guruh tanlangan bo‘lsa, faqat shu guruh uchun.</Info></h2>
           <p className="text-sm text-slate-300">{groupLabel ? `Guruh: ${groupLabel}` : 'Barcha guruhlar'}</p>
         </div>
         <Button onClick={download} disabled={busy || !pre?.pages}>{busy ? 'Tayyorlanmoqda…' : 'Hisobotni yuklab olish'}</Button>
@@ -242,22 +242,22 @@ function ReportPanel({ group, groupLabel, version }) {
       {pre && (
         <div className="mt-3 space-y-2 text-[15px]">
           <p className="text-slate-200">
-            Ijarada turadigan <b className="font-medium text-white">{pre.students}</b> talabadan <b className="font-medium text-positive">{pre.complete}</b> tasida 4 ta rasm bor,
+            Ijarada turadigan <b className="font-medium text-fg">{pre.students}</b> talabadan <b className="font-medium text-positive">{pre.complete}</b> tasida 4 ta rasm bor,
             {' '}<b className={`font-medium ${pre.incomplete.length ? 'text-warning' : 'text-positive'}`}>{pre.incomplete.length}</b> tasida yetishmaydi. Hisobot {pre.pages} sahifa.
           </p>
           {pre.incomplete.length > 0 && (
             <>
-              <button type="button" onClick={() => setShowList(!showList)} className="min-h-9 text-sm text-slate-200 underline underline-offset-4 hover:text-white">{showList ? 'Yopish' : 'Kimlarda yo‘qligini ko‘rish'}</button>
+              <button type="button" onClick={() => setShowList(!showList)} className="min-h-9 text-sm text-slate-200 underline underline-offset-4 hover:text-fg">{showList ? 'Yopish' : 'Kimlarda yo‘qligini ko‘rish'}</button>
               {showList && (
                 <ul className="max-h-48 overflow-y-auto rounded-[14px] bg-ink-700 px-4 py-1">
                   {pre.incomplete.map((s, i) => (
-                    <li key={i} className="flex justify-between gap-3 border-b border-[var(--rule)] py-2 text-sm last:border-0"><span className="text-white">{s.fullName} <span className="text-slate-400">{s.groupIndex}</span></span><span className="tabular-nums text-warning">{s.count} / {TOTAL}</span></li>
+                    <li key={i} className="flex justify-between gap-3 border-b border-[var(--rule)] py-2 text-sm last:border-0"><span className="text-fg">{s.fullName} <span className="text-slate-400">{s.groupIndex}</span></span><span className="tabular-nums text-warning">{s.count} / {TOTAL}</span></li>
                   ))}
                 </ul>
               )}
               <div className="flex flex-wrap gap-x-6 gap-y-1 pt-1 text-sm text-slate-200">
-                <label className="flex min-h-9 items-center gap-2"><input type="radio" name="missing" checked={mode === 'placeholder'} onChange={() => setMode('placeholder')} className="accent-white" />Yetishmaganlarni "Rasm yo‘q" bilan chiqarish</label>
-                <label className="flex min-h-9 items-center gap-2"><input type="radio" name="missing" checked={mode === 'skip'} onChange={() => setMode('skip')} className="accent-white" />O‘tkazib yuborish</label>
+                <label className="flex min-h-9 items-center gap-2"><input type="radio" name="missing" checked={mode === 'placeholder'} onChange={() => setMode('placeholder')} className="accent-fg" />Yetishmaganlarni "Rasm yo‘q" bilan chiqarish</label>
+                <label className="flex min-h-9 items-center gap-2"><input type="radio" name="missing" checked={mode === 'skip'} onChange={() => setMode('skip')} className="accent-fg" />O‘tkazib yuborish</label>
               </div>
             </>
           )}
@@ -286,7 +286,8 @@ export default function Photos() {
 
   const shown = useMemo(() => {
     const s = q.trim().toLowerCase();
-    return s ? rows.filter((r) => r.fullName.toLowerCase().includes(s)) : rows;
+    const list = s ? rows.filter((r) => r.fullName.toLowerCase().includes(s)) : rows;
+    return [...list].sort((a, b) => a.count - b.count || a.groupIndex.localeCompare(b.groupIndex) || a.fullName.localeCompare(b.fullName));
   }, [rows, q]);
   const opened = rows.find((r) => r._id === openId);
   const groupLabel = groups.find((g) => g._id === group)?.index || '';
@@ -322,7 +323,7 @@ export default function Photos() {
             <button key={r._id} type="button" onClick={() => setOpenId(r._id)} className="flex w-full flex-wrap items-center gap-x-4 gap-y-2 border-b border-[var(--rule)] py-3 text-left transition hover:bg-ink-800 md:min-h-[72px] md:flex-nowrap">
               <Avatar name={r.fullName} size={40} />
               <span className="min-w-0 basis-[calc(100%-3.5rem)] md:flex-1 md:basis-0">
-                <span className="block font-medium text-white md:truncate">{r.fullName}</span>
+                <span className="block font-medium text-fg md:truncate">{r.fullName}</span>
                 <span className="block text-[13px] text-slate-300 md:truncate">{r.groupIndex}{r.address ? ` · ${r.address}` : ''}</span>
               </span>
               <span className="ml-14 flex items-center gap-1 md:ml-0" aria-hidden>

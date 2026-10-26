@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import { api, formatPhone } from '../api.js';
-import { Alert, Button, Card, Field, Input, Logo, Picker } from '../components/ui.jsx';
+import { Alert, Button, Card, Field, Input, Logo, Picker, ThemeButton } from '../components/ui.jsx';
 import MapPicker, { mapsLink } from '../components/MapPicker.jsx';
 
 const REGION = 'Toshkent shahar';
@@ -13,7 +13,7 @@ const Section = ({ title, hint, children }) => (
   <section>
     <Card className="space-y-4">
       <div>
-        <h2 className="text-base font-semibold text-white">{title}</h2>
+        <h2 className="text-base font-semibold text-fg">{title}</h2>
         {hint && <p className="mt-1 text-sm leading-snug text-slate-300">{hint}</p>}
       </div>
       {children}
@@ -44,7 +44,14 @@ export default function FormPage() {
   const [mapOpen, setMapOpen] = useState(false);
   const [locating, setLocating] = useState(false);
 
+  const [params] = useSearchParams();
+
   useEffect(() => { api('/public/config').then(setCfg).catch((e) => setError(e.message)); }, []);
+  // Tyutor guruh havolasini yuborsa (?g=...), guruh avtomatik tanlanadi
+  useEffect(() => {
+    const g = params.get('g');
+    if (cfg && g && !groupId && cfg.groups.some((x) => x._id === g)) pickGroup(g);
+  }, [cfg]); // eslint-disable-line
 
   const group = cfg?.groups.find((g) => g._id === groupId);
   const fields = useMemo(() => (cfg?.fields || []).filter((f) => f.enabled), [cfg]);
@@ -95,12 +102,12 @@ export default function FormPage() {
       <header className="border-b border-[var(--rule)]">
         <div className="mx-auto flex h-12 max-w-xl items-center justify-between px-4">
           <Logo />
-          <Link to="/admin" className="rounded-full px-2 py-1.5 text-sm text-slate-300 transition hover:text-white">Admin</Link>
+          <div className="-mr-2 flex items-center"><Link to="/admin" className="rounded-full px-3 py-2 text-sm text-slate-300 transition hover:text-fg">Admin</Link><ThemeButton /></div>
         </div>
       </header>
 
       <main className="mx-auto max-w-xl px-4 pb-32 pt-8">
-        <h1 className="text-2xl font-semibold text-white">Ijara ma’lumotlari</h1>
+        <h1 className="text-2xl font-semibold text-fg">Ijara ma’lumotlari</h1>
         {!done && <p className="mb-6 mt-1 text-[15px] leading-relaxed text-slate-300">Ijarada yoki boshqa joyda yashayotgan talabalar uchun. To‘ldirish 2-3 daqiqa oladi, har bir talaba formani faqat bir marta yuboradi.</p>}
 
         {!cfg && !error && <p className="py-10 text-center text-slate-400">Yuklanmoqda…</p>}
@@ -111,7 +118,7 @@ export default function FormPage() {
               <circle cx="12" cy="12" r="9.5" />
               <motion.path d="M7.5 12.5l3 3 6-7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.35 }} />
             </svg>
-            <h2 className="text-lg font-semibold text-white">Ma’lumotlaringiz qabul qilindi</h2>
+            <h2 className="text-lg font-semibold text-fg">Ma’lumotlaringiz qabul qilindi</h2>
             <p className="mt-1 text-sm text-slate-300">Xatolik bo‘lsa, guruh tyutoringizga murojaat qiling.</p>
             <Button variant="ghost" className="mt-6" onClick={reset}>Yangi forma to‘ldirish</Button>
           </Card>
@@ -130,7 +137,7 @@ export default function FormPage() {
                 {group && (
                   <dl className="grid grid-cols-2 gap-x-3 gap-y-3 rounded-[14px] bg-ink-700 p-4 text-sm">
                     {[['Fakultet', group.faculty], ['Yo‘nalish', group.direction], ['Kurs', group.course], ['Guruh tyutori', group.tutor || '—']].map(([k, v]) => (
-                      <div key={k}><dt className="text-xs text-slate-300">{k}</dt><dd className="font-medium text-white">{v}</dd></div>
+                      <div key={k}><dt className="text-xs text-slate-300">{k}</dt><dd className="font-medium text-fg">{v}</dd></div>
                     ))}
                   </dl>
                 )}
@@ -179,7 +186,7 @@ export default function FormPage() {
                     >
                       <div className="space-y-3 rounded-[14px] bg-ink-700 p-3.5">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-white">{i + 1}-shaxs</span>
+                          <span className="text-sm font-medium text-fg">{i + 1}-shaxs</span>
                           <button type="button" onClick={() => setPeople(people.filter((x) => x.id !== p.id))} className="min-h-9 rounded-full px-3 text-sm text-negative transition hover:bg-negative/10">O‘chirish</button>
                         </div>
                         <Input placeholder="Kim ekanligi (masalan: TDPI talabasi)" value={p.info} onChange={(e) => setPerson(i, { info: e.target.value })} />

@@ -1,70 +1,147 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
-/* Bosmachi: true-black-flat uslubi. Soviq, deyarli qora fon; ko'tarilish faqat yorug'lik pog'onasi bilan.
-   Ko'k rang (accent) faqat ma'lumotda: to'ldirish chiziqlari, rasm joylari. Tugma, tab va menyuda emas. */
-@theme {
-  --font-sans: "Inter Variable", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-
-  /* yuzalar: fon -> karta -> ichki panel */
-  --color-ink-950: #0c0d0f;
-  --color-ink-900: #101215;
-  --color-ink-800: #15171a;
-  --color-ink-700: #26292e;
-  --color-ink-600: #444a52;
-
-  /* ma'lumot rangi (sky blue) va holat ranglari */
-  --color-accent: #4cb3f0;
-  --color-positive: #3fc07a;
-  --color-negative: #e5566f;
-  --color-warning: #e5a93b;
-
-  /* matn pog'onalari: asosiy (oq), ikkinchi (#b4b4b4), meta (#949494) — 4.5:1 dan kam emas */
-  --color-slate-100: #f2f2f2;
-  --color-slate-200: #e0e0e0;
-  --color-slate-300: #b4b4b4;
-  --color-slate-400: #949494;
-  --color-slate-500: #8a8f96;
-
-  /* holat tuslari (yashil, sariq, qizil) */
-  --color-emerald-300: #3fc07a;
-  --color-emerald-400: #3fc07a;
-  --color-emerald-500: #3fc07a;
-  --color-amber-200: #e5a93b;
-  --color-amber-300: #e5a93b;
-  --color-amber-400: #e5a93b;
-  --color-amber-500: #e5a93b;
-  --color-red-200: #e5566f;
-  --color-red-300: #e5566f;
-  --color-red-400: #e5566f;
-  --color-red-500: #e5484d;
+/* Hygge: bitta geometriya, ikki rang rejimi.
+   Qorong'i: true-black-flat (soviq qora fon, yorug'lik pog'onalari).
+   Yorug': achromatic-ledger (ko'k-kulrang fon, oq kartalar, qora asosiy tugma).
+   Ko'k (accent) faqat ma'lumotda: to'ldirish chiziqlari, rasm joylari. Tugma, tab va menyuda emas. */
+:root {
+  color-scheme: light;
+  --ground: #f2f4f7;
+  --surface: #ffffff;
+  --inset: #ffffff;
+  --raised: #e9ecf0;
+  --control: #c4cad2;
+  --rule: #e4e7eb;
+  --fg: #0a0a0a;
+  --onfg: #ffffff;
+  --t1: #15181c;
+  --t2: #2a2f36;
+  --t3: #4a5159;
+  --t4: #5d646e;
+  --t5: #6b7280;
+  --accent: #1d5fbf;
+  --positive: #247b50;
+  --negative: #c4242a;
+  --warning: #92400e;
+  --pill-positive-bg: #dcfae5; --pill-positive-ink: #04250e;
+  --pill-negative-bg: #ffedea; --pill-negative-ink: #831c1e;
+  --pill-warning-bg: #fffbeb; --pill-warning-ink: #92400e;
+  --pill-neutral-bg: #e9ecf0; --pill-neutral-ink: #2a2f36;
+  --av-bg: 91%; --av-fg: 30%;
+  --backdrop: rgba(10, 12, 16, 0.55);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground: #0c0d0f;
+  --surface: #15171a;
+  --inset: #101215;
+  --raised: #26292e;
+  --control: #444a52;
+  --rule: #1f2226;
+  --fg: #ffffff;
+  --onfg: #000000;
+  --t1: #f2f2f2;
+  --t2: #e0e0e0;
+  --t3: #b4b4b4;
+  --t4: #949494;
+  --t5: #8a8f96;
+  --accent: #4cb3f0;
+  --positive: #3fc07a;
+  --negative: #e5566f;
+  --warning: #e5a93b;
+  --pill-positive-bg: #172a1d; --pill-positive-ink: #3fc07a;
+  --pill-negative-bg: #2c1a20; --pill-negative-ink: #e5566f;
+  --pill-warning-bg: #2b2414; --pill-warning-ink: #e5a93b;
+  --pill-neutral-bg: #222222; --pill-neutral-ink: #ffffff;
+  --av-bg: 21%; --av-fg: 80%;
+  --backdrop: rgba(0, 0, 0, 0.8);
 }
 
-:root { color-scheme: dark; --rule: #1f2226; }
+@theme {
+  --font-sans: "Onest Variable", "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* yuzalar: fon -> karta -> ichki panel */
+  --color-ink-950: var(--ground);
+  --color-ink-900: var(--inset);
+  --color-ink-800: var(--surface);
+  --color-ink-700: var(--raised);
+  --color-ink-600: var(--control);
+
+  --color-fg: var(--fg);
+  --color-onfg: var(--onfg);
+  --color-accent: var(--accent);
+  --color-positive: var(--positive);
+  --color-negative: var(--negative);
+  --color-warning: var(--warning);
+
+  /* matn pog'onalari */
+  --color-slate-100: var(--t1);
+  --color-slate-200: var(--t2);
+  --color-slate-300: var(--t3);
+  --color-slate-400: var(--t4);
+  --color-slate-500: var(--t5);
+
+  --color-emerald-300: var(--positive);
+  --color-emerald-400: var(--positive);
+  --color-emerald-500: var(--positive);
+  --color-amber-200: var(--warning);
+  --color-amber-300: var(--warning);
+  --color-amber-400: var(--warning);
+  --color-amber-500: var(--warning);
+  --color-red-200: var(--negative);
+  --color-red-300: var(--negative);
+  --color-red-400: var(--negative);
+  --color-red-500: var(--negative);
+}
+
 html { -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent; }
 html, body, #root { min-height: 100%; }
 body {
   margin: 0;
-  color: #fff;
-  background: #0c0d0f;
+  color: var(--fg);
+  background: var(--ground);
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.5;
   font-variant-numeric: tabular-nums;
+  overscroll-behavior-y: none;
 }
-h1, h2, h3 { letter-spacing: -0.01em; text-wrap: balance; }
+h1, h2, h3 { letter-spacing: -0.012em; text-wrap: balance; }
 button, a { touch-action: manipulation; }
-select option { background: #15171a; color: #fff; }
-.leaflet-container { background: #15171a; isolation: isolate; }
-:focus-visible { outline: 2px solid #4cb3f0; outline-offset: 2px; }
+select option { background: var(--surface); color: var(--fg); }
+::selection { background: color-mix(in srgb, var(--accent) 35%, transparent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Holat tuslari: to'q fonda o'z rangining to'q tusi */
+/* Rejim almashganda yumshoq o'tish (faqat almashtirish paytida yoqiladi) */
+html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
+  transition: background-color 220ms ease, border-color 220ms ease, color 220ms ease, fill 220ms ease !important;
+}
+
+/* Xarita: qorong'i rejimda plitkalar qorong'ilashtiriladi */
+.leaflet-container { background: var(--surface); isolation: isolate; }
+:root[data-theme="dark"] .leaflet-tile-pane { filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9); }
+
+/* Holat tuslari: o'z rangining tusi (ikkala rejimda 4.5:1) */
 .pill { display: inline-flex; align-items: center; white-space: nowrap; flex: none; height: 22px; padding: 0 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
-.pill-positive { background: #172a1d; color: #3fc07a; }
-.pill-negative { background: #2c1a20; color: #e5566f; }
-.pill-warning { background: #2b2414; color: #e5a93b; }
-.pill-neutral { background: #222; color: #fff; }
+.pill-positive { background: var(--pill-positive-bg); color: var(--pill-positive-ink); }
+.pill-negative { background: var(--pill-negative-bg); color: var(--pill-negative-ink); }
+.pill-warning { background: var(--pill-warning-bg); color: var(--pill-warning-ink); }
+.pill-neutral { background: var(--pill-neutral-bg); color: var(--pill-neutral-ink); }
+.alert-error { background: var(--pill-negative-bg); color: var(--pill-negative-ink); }
+.alert-ok { background: var(--pill-positive-bg); color: var(--pill-positive-ink); }
+
+/* Odamlar: o'z rangining och tusi (rejimga qarab ochiq yoki to'q) */
+.avatar { background: hsl(var(--h) 32% var(--av-bg)); color: hsl(var(--h) 55% var(--av-fg)); }
 
 /* Yordam bloki: <details> belgisini yashiramiz, o'zimiz chizamiz */
 details > summary { list-style: none; }
 details > summary::-webkit-details-marker { display: none; }
+
+/* Pastki navigatsiya: iPhone pastki chizig'i va ilova rejimi */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+@media (display-mode: standalone) { body { user-select: none; -webkit-user-select: none; } input, textarea, [contenteditable] { user-select: text; -webkit-user-select: text; } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}

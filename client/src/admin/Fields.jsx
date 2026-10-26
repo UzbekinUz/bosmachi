@@ -53,10 +53,10 @@ export default function Fields() {
         {list.map((f, i) => (
           <div key={f.key} role="row" className={`grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-x-4 gap-y-3 border-b border-[var(--rule)] py-3 sm:grid-cols-[3rem_minmax(0,1fr)_7rem_7rem] ${f.enabled ? '' : 'opacity-60'}`}>
             <div className="flex flex-col items-center">
-              <button onClick={() => move(i, -1)} disabled={i === 0} className="grid h-7 w-9 place-items-center text-slate-300 hover:text-white disabled:opacity-30" aria-label="Yuqoriga">
+              <button onClick={() => move(i, -1)} disabled={i === 0} className="grid h-7 w-9 place-items-center text-slate-300 hover:text-fg disabled:opacity-30" aria-label="Yuqoriga">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5-5 5 5" /></svg>
               </button>
-              <button onClick={() => move(i, 1)} disabled={i === list.length - 1} className="grid h-7 w-9 place-items-center text-slate-300 hover:text-white disabled:opacity-30" aria-label="Pastga">
+              <button onClick={() => move(i, 1)} disabled={i === list.length - 1} className="grid h-7 w-9 place-items-center text-slate-300 hover:text-fg disabled:opacity-30" aria-label="Pastga">
                 <svg className="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m5 8 5 5 5-5" /></svg>
               </button>
             </div>

@@ -81,7 +81,7 @@ export default function Overview() {
             { label: 'Forma to‘ldirgan', value: `${pct(total.submitted, total.students)}%`, caption: `${total.submitted} / ${total.students} talaba` },
           ]} />
 
-          <h2 className="mb-1 mt-10 text-base font-semibold text-white">Kuratorlar</h2>
+          <h2 className="mb-1 mt-10 text-base font-semibold text-fg">Kuratorlar</h2>
           <p className="mb-3 text-sm text-slate-300">Guruhlar bo‘yicha forma va rasm holati.</p>
           <div role="table" aria-label="Kuratorlar">
             <div role="row" className={`${GRID} hidden border-b border-[var(--rule)] pb-2 text-xs text-slate-400 lg:grid`}>
@@ -93,7 +93,7 @@ export default function Overview() {
                   <span className="flex min-w-0 items-center gap-3">
                     <Avatar name={c.fullName} size={36} />
                     <span className="min-w-0">
-                      <span className="block truncate font-medium text-white">{c.fullName}{!c.active && <Pill tone="negative" className="ml-2 align-middle">faol emas</Pill>}</span>
+                      <span className="block truncate font-medium text-fg">{c.fullName}{!c.active && <Pill tone="negative" className="ml-2 align-middle">faol emas</Pill>}</span>
                       <span className="block text-[13px] text-slate-300 lg:truncate">@{c.username}{c.phone ? ` · ${c.phone}` : ''}</span>
                       <span className="block text-[13px] text-slate-400">Oxirgi faollik: {ago(c.lastActiveAt)}</span>
                     </span>
@@ -106,7 +106,7 @@ export default function Overview() {
                   <div className="mb-3 rounded-[14px] bg-ink-800 px-4 py-2">
                     {c.groupList.length ? c.groupList.map((g) => (
                       <div key={g._id} className={`${GRID} flex flex-col gap-1.5 border-b border-[var(--rule)] py-2.5 text-sm last:border-0`}>
-                        <span className="font-medium text-white">{g.index}</span>
+                        <span className="font-medium text-fg">{g.index}</span>
                         <span className="tabular-nums text-slate-200 lg:text-right">{g.students} talaba</span>
                         <Meter value={g.submitted} total={g.students} />
                         <Meter value={g.photosComplete} total={g.submitted} />
@@ -121,11 +121,11 @@ export default function Overview() {
 
           {data?.unassigned.length > 0 && (
             <>
-              <h2 className="mb-1 mt-10 text-base font-semibold text-white">Biriktirilmagan guruhlar</h2>
+              <h2 className="mb-1 mt-10 text-base font-semibold text-fg">Biriktirilmagan guruhlar</h2>
               <p className="mb-3 text-sm text-slate-300">Hech bir kuratorga berilmagan, ularni siz boshqarasiz.</p>
               {data.unassigned.map((g) => (
                 <div key={g._id} className={`${GRID} flex flex-col gap-1.5 border-b border-[var(--rule)] py-3`}>
-                  <span className="font-medium text-white">{g.index}</span>
+                  <span className="font-medium text-fg">{g.index}</span>
                   <span className="text-sm tabular-nums text-slate-200 lg:text-right">{g.students} talaba</span>
                   <Meter value={g.submitted} total={g.students} />
                   <Meter value={g.photosComplete} total={g.submitted} />
@@ -136,7 +136,7 @@ export default function Overview() {
         </div>
 
         <aside className="min-w-0">
-          <h2 className="mb-3 text-base font-semibold text-white">Faoliyat jurnali</h2>
+          <h2 className="mb-3 text-base font-semibold text-fg">Faoliyat jurnali</h2>
           <Field label="Kurator">
             <Select value={who} onChange={(e) => setWho(e.target.value)}>
               <option value="">Hammasi</option>
@@ -146,7 +146,7 @@ export default function Overview() {
           <ul className="mt-3">
             {(more ? log : log.slice(0, 8)).map((l) => (
               <li key={l._id} className="border-b border-[var(--rule)] py-2.5 text-sm">
-                <div className="flex items-baseline justify-between gap-3"><span className="font-medium text-white">{l.fullName || l.username}</span><span className="shrink-0 text-xs text-slate-400">{ago(l.at)}</span></div>
+                <div className="flex items-baseline justify-between gap-3"><span className="font-medium text-fg">{l.fullName || l.username}</span><span className="shrink-0 text-xs text-slate-400">{ago(l.at)}</span></div>
                 <div className="text-slate-300">{ACTION[l.action] || l.action}{l.summary && l.action !== 'login' ? ` · ${l.summary}` : ''}</div>
               </li>
             ))}

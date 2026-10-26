@@ -103,12 +103,12 @@ export default function Submissions() {
           <div key={r._id} role="row" className={`${COLS} border-b border-[var(--rule)] py-3 md:min-h-14`}>
             <div role="cell" className="flex min-w-0 items-center gap-3">
               <Avatar name={r.fullName} />
-              <button type="button" onClick={() => setEdit(r)} className="min-w-0 text-left"><span className="block font-medium text-white md:truncate">{r.fullName}</span><span className="block text-[13px] text-slate-400">{r.groupIndex}</span></button>
+              <button type="button" onClick={() => setEdit(r)} className="min-w-0 text-left"><span className="block font-medium text-fg md:truncate">{r.fullName}</span><span className="block text-[13px] text-slate-400">{r.groupIndex}</span></button>
             </div>
-            <a role="cell" href={`tel:${r.phone}`} className="whitespace-nowrap text-right text-sm tabular-nums text-slate-200 hover:text-white">{r.phone || '—'}</a>
+            <a role="cell" href={`tel:${r.phone}`} className="whitespace-nowrap text-right text-sm tabular-nums text-slate-200 hover:text-fg">{r.phone || '—'}</a>
             <div role="cell" className="min-w-0 truncate text-sm text-slate-300 md:col-auto">{[r.district, r.mahalla].filter(Boolean).join(', ') || '—'}</div>
             <div role="cell"><StatusSelect value={r.rentStatus} options={statuses} onChange={(v) => patch(r._id, { rentStatus: v })} /></div>
-            <div role="cell" className="hidden md:col-span-1 md:block md:text-right"><button onClick={() => setEdit(r)} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline">Ko‘rish</button></div>
+            <div role="cell" className="hidden md:col-span-1 md:block md:text-right"><button onClick={() => setEdit(r)} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">Ko‘rish</button></div>
           </div>
         ))}
         {!shown.length && <p className="rounded-[14px] border border-dashed border-ink-600 px-4 py-8 text-center text-sm text-slate-400">Hali ma’lumot yo‘q. Talabalar formani to‘ldirgach, shu yerda ko‘rinadi.</p>}
@@ -125,7 +125,7 @@ function Detail({ row, onClose, onSave, onDelete }) {
       <div className="mb-5 flex items-center gap-3">
         <Avatar name={row.fullName} size={44} />
         <div className="min-w-0">
-          <div className="truncate text-lg font-semibold text-white">{row.fullName}</div>
+          <div className="truncate text-lg font-semibold text-fg">{row.fullName}</div>
           <div className="text-sm text-slate-300">{row.groupIndex} · {row.faculty} · {row.course} · Tyutor: {row.tutor || '—'}</div>
         </div>
       </div>
@@ -134,13 +134,13 @@ function Detail({ row, onClose, onSave, onDelete }) {
       </div>
       {!!row.cohabitants?.length && (
         <div className="mt-6">
-          <h4 className="mb-2 text-sm font-medium text-white">Birga yashovchilar</h4>
+          <h4 className="mb-2 text-sm font-medium text-fg">Birga yashovchilar</h4>
           <ul className="space-y-2 text-sm text-slate-200">
             {row.cohabitants.map((c, i) => <li key={i} className="rounded-[10px] bg-ink-700 px-3 py-2">{[c.info, c.fullName, c.phone].filter(Boolean).join(' · ')}</li>)}
           </ul>
         </div>
       )}
-      {row.location && <a href={row.location} target="_blank" rel="noreferrer" className="mt-5 inline-block text-sm text-white underline underline-offset-4">Xaritada ochish</a>}
+      {row.location && <a href={row.location} target="_blank" rel="noreferrer" className="mt-5 inline-block text-sm text-fg underline underline-offset-4">Xaritada ochish</a>}
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <Button variant="danger" onClick={onDelete}>Yozuvni o‘chirish</Button>
         <div className="flex gap-2">

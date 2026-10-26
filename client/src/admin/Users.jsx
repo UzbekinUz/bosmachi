@@ -84,7 +84,7 @@ export default function Users() {
           <div key={u._id} className={`flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[var(--rule)] py-3 md:min-h-[72px] ${u.active ? '' : 'opacity-60'}`}>
             <Avatar name={u.fullName || u.username} size={40} />
             <div className="min-w-0 flex-1 basis-56">
-              <div className="flex flex-wrap items-center gap-2"><span className="font-medium text-white">{u.fullName || u.username}</span>{u.role === 'owner' && <Pill>Egasi</Pill>}{!u.active && <Pill tone="negative">faol emas</Pill>}</div>
+              <div className="flex flex-wrap items-center gap-2"><span className="font-medium text-fg">{u.fullName || u.username}</span>{u.role === 'owner' && <Pill>Egasi</Pill>}{!u.active && <Pill tone="negative">faol emas</Pill>}</div>
               <div className="text-[13px] text-slate-300">@{u.username}{u.phone ? ` · ${u.phone}` : ''}</div>
             </div>
             {u.role === 'curator' && (
@@ -92,7 +92,7 @@ export default function Users() {
                 {u.groups.length ? u.groups.map((id) => <Pill key={id}>{groupName(id)}</Pill>) : <span className="text-sm text-warning">Guruh biriktirilmagan</span>}
               </div>
             )}
-            <button onClick={() => { setError(''); setForm({ ...u, password: '' }); }} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline">Tahrirlash</button>
+            <button onClick={() => { setError(''); setForm({ ...u, password: '' }); }} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">Tahrirlash</button>
           </div>
         ))}
         {!users.length && <p className="rounded-[14px] border border-dashed border-ink-600 px-4 py-8 text-center text-sm text-slate-400">Hali kurator yo‘q.</p>}
@@ -100,11 +100,11 @@ export default function Users() {
 
       {unassigned.length > 0 && (
         <section className="mt-10">
-          <h2 className="mb-1 text-base font-semibold text-white">Biriktirilmagan guruhlar</h2>
+          <h2 className="mb-1 text-base font-semibold text-fg">Biriktirilmagan guruhlar</h2>
           <p className="mb-3 text-sm text-slate-300">Hech bir kuratorga berilmagan guruhlarni shu yerdan biriktiring.</p>
           {unassigned.map((g) => (
             <div key={g._id} className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-[var(--rule)] py-3">
-              <div className="min-w-0 flex-1 basis-40"><div className="font-medium text-white">{g.index}</div><div className="text-[13px] text-slate-300">{g.students} talaba · {g.faculty}</div></div>
+              <div className="min-w-0 flex-1 basis-40"><div className="font-medium text-fg">{g.index}</div><div className="text-[13px] text-slate-300">{g.students} talaba · {g.faculty}</div></div>
               <div className="flex flex-1 basis-72 items-center gap-2">
                 <Select value={pick[g._id] || ''} onChange={(e) => setPick({ ...pick, [g._id]: e.target.value })} aria-label={`${g.index} uchun kurator`}>
                   <option value="">Kuratorni tanlang…</option>
@@ -132,17 +132,17 @@ export default function Users() {
                   </div>
                 </Field>
                 <div>
-                  <span className="mb-2 block text-sm font-medium text-white">Biriktirilgan guruhlar</span>
+                  <span className="mb-2 block text-sm font-medium text-fg">Biriktirilgan guruhlar</span>
                   <div className="grid max-h-52 grid-cols-2 gap-1 overflow-y-auto rounded-[10px] bg-ink-900 p-2">
                     {groups.map((g) => (
                       <label key={g._id} className="flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm text-slate-200 hover:bg-ink-700">
-                        <input type="checkbox" checked={form.groups.includes(g._id)} onChange={() => toggleGroup(g._id)} className="h-4 w-4 accent-white" />{g.index}
+                        <input type="checkbox" checked={form.groups.includes(g._id)} onChange={() => toggleGroup(g._id)} className="h-4 w-4 accent-fg" />{g.index}
                       </label>
                     ))}
                     {!groups.length && <p className="col-span-2 py-3 text-center text-sm text-slate-400">Avval guruh yarating</p>}
                   </div>
                 </div>
-                {form._id && <label className="flex min-h-9 items-center gap-2 text-sm text-slate-200"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-white" />Faol (tizimga kira oladi)</label>}
+                {form._id && <label className="flex min-h-9 items-center gap-2 text-sm text-slate-200"><input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-fg" />Faol (tizimga kira oladi)</label>}
               </>
             )}
             <Alert>{error}</Alert>
@@ -157,7 +157,7 @@ export default function Users() {
       {created && (
         <Modal title="Kirish ma’lumotlari" onClose={() => setCreated(null)}>
           <p className="mb-3 text-sm text-slate-300">Buni kuratorga yuboring. Parol bu oynada faqat hozir ko‘rinadi.</p>
-          <div className="space-y-1 rounded-[14px] bg-ink-700 p-4 text-sm text-white">
+          <div className="space-y-1 rounded-[14px] bg-ink-700 p-4 text-sm text-fg">
             <div>Login: <b className="font-semibold">{created.username}</b></div>
             <div>Parol: <b className="font-semibold">{created.password}</b></div>
           </div>

@@ -42,17 +42,17 @@ export default function Monitor() {
       ]} />
 
       <section className="mt-10">
-        <h2 className="mb-1 text-base font-semibold text-white">Guruhlar bo‘yicha</h2>
+        <h2 className="mb-1 text-base font-semibold text-fg">Guruhlar bo‘yicha</h2>
         <p className="mb-3 text-sm text-slate-300">Formani to‘ldirgan talabalar ulushi.</p>
         <div>
           {r.groups.map((g) => (
             <div key={g._id} className="border-b border-[var(--rule)] py-3">
               <div className="grid items-center gap-x-6 gap-y-2 md:grid-cols-[10rem_1fr_9rem]">
-                <div className="min-w-0"><div className="font-medium text-white">{g.index}</div>{g.tutor && <div className="truncate text-[13px] text-slate-400">{g.tutor}</div>}</div>
+                <div className="min-w-0"><div className="font-medium text-fg">{g.index}</div>{g.tutor && <div className="truncate text-[13px] text-slate-400">{g.tutor}</div>}</div>
                 <Meter value={g.submitted} total={g.total} />
                 <div className="md:text-right">
                   {g.missing.length > 0
-                    ? <button onClick={() => setOpen({ ...open, [g._id]: !open[g._id] })} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline">{open[g._id] ? 'Yopish' : `Kimlar yo‘q (${g.missing.length})`}</button>
+                    ? <button onClick={() => setOpen({ ...open, [g._id]: !open[g._id] })} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">{open[g._id] ? 'Yopish' : `Kimlar yo‘q (${g.missing.length})`}</button>
                     : <span className="text-sm text-slate-400">{g.total ? 'Hamma to‘ldirgan' : 'Talaba yo‘q'}</span>}
                 </div>
               </div>
@@ -70,18 +70,18 @@ export default function Monitor() {
       <section className="mt-10">
         <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
           <div>
-            <h2 className="text-base font-semibold text-white">Tekshiruv natijalari</h2>
+            <h2 className="text-base font-semibold text-fg">Tekshiruv natijalari</h2>
             <p className="text-sm text-slate-300">{issues.length} ta yozuvda izoh bor.</p>
           </div>
           <label className="flex min-h-9 items-center gap-2 text-sm text-slate-200">
-            <input type="checkbox" checked={onlyWarn} onChange={(e) => setOnlyWarn(e.target.checked)} className="h-4 w-4 accent-white" />
+            <input type="checkbox" checked={onlyWarn} onChange={(e) => setOnlyWarn(e.target.checked)} className="h-4 w-4 accent-fg" />
             Faqat jiddiy muammolar
           </label>
         </div>
         <div>
           {issues.map((i) => (
             <div key={i.id} className="border-b border-[var(--rule)] py-3">
-              <div className="mb-1 flex items-center gap-3"><Avatar name={i.fullName} size={28} /><span className="font-medium text-white">{i.fullName}</span><span className="text-sm text-slate-400">{i.groupIndex}</span></div>
+              <div className="mb-1 flex items-center gap-3"><Avatar name={i.fullName} size={28} /><span className="font-medium text-fg">{i.fullName}</span><span className="text-sm text-slate-400">{i.groupIndex}</span></div>
               <ul className="ml-10 space-y-0.5 text-sm">
                 {i.problems.filter((p) => !onlyWarn || p.level === 'warn').map((p, k) => (
                   <li key={k} className={p.level === 'warn' ? 'text-warning' : 'text-slate-300'}>{p.text}</li>

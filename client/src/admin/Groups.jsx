@@ -4,7 +4,7 @@ import { api, formatPhone } from '../api.js';
 import { Alert, Avatar, Button, Field, Input, Kpis, Meter, Modal, PageHead } from '../components/ui.jsx';
 
 const blank = { index: '', faculty: '', direction: '', course: '', tutor: '', tutorPhone: '' };
-const COLS = 'lg:grid lg:grid-cols-[7rem_minmax(0,1.6fr)_5rem_minmax(0,1.3fr)_5rem_11rem_8.5rem] lg:items-center lg:gap-4';
+const COLS = 'lg:grid lg:grid-cols-[7rem_minmax(0,1.6fr)_5rem_minmax(0,1.3fr)_5rem_11rem_13rem] lg:items-center lg:gap-4';
 
 export default function Groups() {
   const { me } = useOutletContext();
@@ -13,6 +13,7 @@ export default function Groups() {
   const [form, setForm] = useState(null); // {_id?, ...}
   const [studentsOf, setStudentsOf] = useState(null);
   const [error, setError] = useState('');
+  const [copied, setCopied] = useState('');
 
   const load = () => api('/admin/groups').then(setGroups).catch((e) => setError(e.message));
   useEffect(() => { load(); }, []);
@@ -31,6 +32,9 @@ export default function Groups() {
 
   const totalStudents = groups.reduce((a, g) => a + g.students, 0);
   const totalSubmitted = groups.reduce((a, g) => a + g.submissions, 0);
+  const copyLink = async (g) => {
+    try { await navigator.clipboard.writeText(`${location.origin}/?g=${g._id}`); setCopied(g._id); setTimeout(() => setCopied(''), 1800); } catch { setError('Havolani nusxalab bo‘lmadi'); }
+  };
   const behind = groups.filter((g) => g.students && g.submissions < g.students);
   const newGroup = () => { setError(''); setForm({ ...blank, ...(curator ? { tutor: me.fullName, tutorPhone: me.phone } : {}) }); };
 
@@ -43,7 +47,7 @@ export default function Groups() {
         steps={[
           '"Yangi guruh": indeks (masalan I-87/25i), fakultet, yo‘nalish, kurs va guruh tyutorining ismi hamda telefonini kiriting. Talaba formada guruhni shu indeks bilan tanlaydi.',
           '"Talabalar" tugmasi guruh ro‘yxatini ochadi. Ismlarni Excel’dan nusxalab, har qatorga bittadan qo‘yish mumkin, ular avtomatik to‘g‘ri yoziladi.',
-          '"To‘ldirgan" chizig‘i nechta talaba formani to‘ldirganini ko‘rsatadi.',
+          '"To‘ldirgan" chizig‘i nechta talaba formani to‘ldirganini ko‘rsatadi. "Havola" talabalarga yuboriladigan forma havolasini nusxalaydi: guruh o‘zi tanlangan bo‘lib ochiladi.',
           'Guruhni o‘chirsangiz, uning talabalari, yozuvlari va rasmlari ham o‘chadi. Yozuvli guruhni faqat egasi o‘chira oladi.',
         ]}
       >
@@ -67,15 +71,16 @@ export default function Groups() {
         </div>
         {groups.map((g) => (
           <div key={g._id} role="row" className={`${COLS} flex flex-col gap-1.5 border-b border-[var(--rule)] py-3 lg:min-h-14`}>
-            <div role="cell" className="font-medium text-white">{g.index}</div>
+            <div role="cell" className="font-medium text-fg">{g.index}</div>
             <div role="cell" className="min-w-0 text-sm text-slate-300 lg:truncate">{g.faculty}{g.direction && g.direction !== g.faculty ? ` · ${g.direction}` : ''}</div>
             <div role="cell" className="text-sm text-slate-300">{g.course}</div>
             <div role="cell" className="min-w-0 truncate text-sm text-slate-300">{g.tutor || '—'}</div>
             <div role="cell" className="text-sm tabular-nums text-slate-200 lg:text-right">{g.students} talaba</div>
             <div role="cell"><Meter value={g.submissions} total={g.students} /></div>
             <div role="cell" className="flex gap-4 lg:justify-end">
-              <button onClick={() => setStudentsOf(g)} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline">Talabalar</button>
-              <button onClick={() => { setError(''); setForm(g); }} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-white hover:underline">Tahrirlash</button>
+              <button onClick={() => setStudentsOf(g)} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">Talabalar</button>
+              <button onClick={() => copyLink(g)} title="Talabalar uchun shu guruh tanlangan forma havolasi" className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">{copied === g._id ? 'Nusxalandi' : 'Havola'}</button>
+              <button onClick={() => { setError(''); setForm(g); }} className="min-h-9 text-sm text-slate-200 underline-offset-4 hover:text-fg hover:underline">Tahrirlash</button>
             </div>
           </div>
         ))}
@@ -128,16 +133,16 @@ function Students({ group, onClose }) {
     <Modal title={`${group.index} · talabalar`} onClose={onClose} wide>
       <Alert>{error}</Alert>
       <Field label="Talabalar qo‘shish" hint="Har bir qatorga bitta to‘liq ism (Excel’dan nusxalab qo‘yish mumkin)">
-        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} className="w-full rounded-[10px] border border-ink-600 bg-ink-900 px-3.5 py-2.5 text-base text-white outline-none focus:border-accent sm:text-sm" />
+        <textarea value={text} onChange={(e) => setText(e.target.value)} rows={4} className="w-full rounded-[10px] border border-ink-600 bg-ink-900 px-3.5 py-2.5 text-base text-fg outline-none focus:border-accent sm:text-sm" />
       </Field>
       <Button className="mt-3" onClick={add}>Qo‘shish</Button>
       <p className="mb-1 mt-6 text-sm text-slate-300">{list.length} ta talaba</p>
       <ul>
         {list.map((s) => (
           <li key={s._id} className="flex items-center justify-between gap-3 border-b border-[var(--rule)] py-2.5 text-sm">
-            <span className="flex min-w-0 items-center gap-3"><Avatar name={s.fullName} size={28} /><span className="truncate text-white">{s.fullName}</span></span>
+            <span className="flex min-w-0 items-center gap-3"><Avatar name={s.fullName} size={28} /><span className="truncate text-fg">{s.fullName}</span></span>
             <span className="flex shrink-0 gap-4">
-              <button onClick={() => rename(s)} className="min-h-9 text-slate-200 underline-offset-4 hover:text-white hover:underline">Tahrirlash</button>
+              <button onClick={() => rename(s)} className="min-h-9 text-slate-200 underline-offset-4 hover:text-fg hover:underline">Tahrirlash</button>
               <button onClick={() => remove(s)} className="min-h-9 text-negative underline-offset-4 hover:underline">O‘chirish</button>
             </span>
           </li>

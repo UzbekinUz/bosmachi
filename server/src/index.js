@@ -334,8 +334,16 @@ app.use('/api/admin', admin);
 /* ---------------- Production: React build ---------------- */
 const dist = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..', 'client', 'dist');
 if (fs.existsSync(dist)) {
-  app.use(express.static(dist));
-  app.get(/^(?!\/api).*/, (req, res) => res.sendFile(path.join(dist, 'index.html')));
+  // Keshlash: hashli fayllar uzoq muddat; sw.js, manifest va index.html har doim yangidan tekshiriladi
+  app.use(express.static(dist, {
+    setHeaders: (res, file) => {
+      if (/[\\/]assets[\\/]/.test(file)) res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      else if (/(sw\.js|index\.html|manifest\.webmanifest|theme-init\.js)$/.test(file)) res.setHeader('Cache-Control', 'no-cache');
+      if (/manifest\.webmanifest$/.test(file)) res.setHeader('Content-Type', 'application/manifest+json');
+      if (/sw\.js$/.test(file)) res.setHeader('Service-Worker-Allowed', '/');
+    },
+  }));
+  app.get(/^(?!\/api).*/, (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(dist, 'index.html')); });
 }
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
