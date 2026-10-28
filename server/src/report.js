@@ -3,8 +3,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import {
-  AlignmentType, BorderStyle, Document, Footer, HeightRule, ImageRun, LineRuleType, Packer, PageOrientation,
-  Paragraph, Table, TableCell, TableRow, TextRun, VerticalAlign, WidthType,
+  AlignmentType, BorderStyle, Document, ExternalHyperlink, Footer, HeightRule, ImageRun, LineRuleType, Packer, PageOrientation,
+  Paragraph, Table, TableCell, TableRow, TextRun, UnderlineType, VerticalAlign, WidthType,
 } from 'docx';
 import { Group, Student, Submission, Photo, User } from './models.js';
 import { photoPath } from './storage.js';
@@ -24,10 +24,10 @@ const PAGE = {
 };
 
 // Rasm 4:3, balandligi 7.8 sm; 2x2 jadval va sarlavha bitta sahifaga sig'adi
-const IMG_W = px(10.4);
-const IMG_H = px(7.8);
+const IMG_W = px(10);
+const IMG_H = px(7.5);
 const COL = tw(10.8);
-const ROW_H = tw(8.05);
+const ROW_H = tw(7.75);
 
 const line = { style: BorderStyle.SINGLE, size: 6, color: '000000' };
 const borders = { top: line, bottom: line, left: line, right: line };
@@ -147,6 +147,8 @@ async function studentSection(page) {
   });
 
   const caption = captionOf(page);
+  // Xonadondagi talabalardan birinchi lokatsiyasi borining havolasi (faqat http/https)
+  const location = page.members.map((m) => m.sub?.location).find((l) => /^https?:\/\//i.test(l || ''));
   // Sarlavha 3 qatordan oshib ketmasligi uchun juda uzun matnda shrift biroz kichraytiriladi
   const size = caption.length > 250 ? 24 : caption.length > 200 ? 28 : 32;
 
@@ -165,7 +167,18 @@ async function studentSection(page) {
           verticalAlign: VerticalAlign.CENTER,
           borders,
           margins: { top: 60, bottom: 60, left: 80, right: 80 },
-          children: [new Paragraph({ alignment: AlignmentType.CENTER, children: [run(caption, { bold: true, size })] })],
+          children: [
+            new Paragraph({ alignment: AlignmentType.CENTER, children: [run(caption, { bold: true, size })] }),
+            // Talabaning lokatsiyasi: bosiladigan havola, bosma nusxada ham o'qiladigan matn bilan
+            ...(location ? [new Paragraph({
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 40 },
+              children: [
+                run('Lokatsiya: ', { size: 20 }),
+                new ExternalHyperlink({ link: location, children: [new TextRun({ text: location, font: FONT, size: 20, color: '0563C1', underline: { type: UnderlineType.SINGLE } })] }),
+              ],
+            })] : []),
+          ],
         })],
       }),
     ],
